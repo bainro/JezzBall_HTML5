@@ -95,6 +95,13 @@ body.win-game:after {
         font-weight:    600;
         font-size:      2em;
     }
+    #cell_container{
+        max-width:  100%;
+        max-height: 100%;
+        overflow:   hidden;
+        left:       0 !important;
+        top:        0 !important;
+    }
 }
 
 #canvas_flex{
@@ -113,6 +120,7 @@ body.win-game:after {
 }
 
 #cell_container{
-    position:   absolute;
-    //background: ;
+    position:           absolute;
+    background:         url('../../images/staredad.jpg') no-repeat;
+    background-size:    cover;
 }

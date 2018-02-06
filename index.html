@@ -107,24 +107,22 @@
                                 var cell = $('<span>').addClass('cell').height(unit).width(unit).css('top', j * unit).css('left', i * unit);
                                 $('#cell_container').append(cell);
                                 row.push(cell);
-                                console.log($('#viewport').position().top);
                             }
                             cells.push(row); //$('<span>')
                         }
 
-                        console.log(cells);
-
                         var i = 2;
                         var circles = [];
                         while (i--) {
-                            var randomVelocity = Math.random() * 0.25 - 0.125;
+                            var plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+                            var randomVelocity = Math.random() * .25 - .125; 
                             circles.push(Physics.body('circle', {
                                 x: Math.random() * canvasWidth
                                 , y: Math.random() * canvasHeight
                                 , radius: unit / 2 - .5
-                                , vx: randomVelocity
-                                , vy: (.0625 - (randomVelocity) ** 2) ** .5
-                                , angularVelocity: Math.random() * .04 - .02
+                                , vx: randomVelocity 
+                                , vy: (0.0625 - randomVelocity**2)**0.5 * plusOrMinus
+                                , angularVelocity: Math.random() * .02 - .01
                                 //, mass: 1
                                 , restitution: 1
                                 , cof: 0
@@ -149,6 +147,10 @@
                         world.on('step', function () {
                             world.render();
                         });
+
+                        $('#viewport').on('click', (e) => {
+                            cells[Math.round(((e.clientX - $('#viewport').position().left) - unit * .5 ) / unit)][Math.round(((e.clientY - $('#viewport').position().top) - unit * .5 ) / unit)].detach();
+                        })
 
                     }
 
@@ -180,6 +182,7 @@
                             document.body.className = 'win-game';
                             inGame = false;
                         });
+
                     };
 
                     // subscribe to ticker and start looping
