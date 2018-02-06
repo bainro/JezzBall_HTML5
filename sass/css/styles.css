@@ -1,0 +1,114 @@
+body {
+  font-family: 'Times New Roman';
+  background: #45676F; }
+
+html, body, ul, ol, li, form, fieldset, legend {
+  margin: 0;
+  padding: 0; }
+
+h1, h2, h3, h4, h5, h6, p {
+  margin-top: 0; }
+
+fieldset, img {
+  border: 0; }
+
+li {
+  list-style: none; }
+
+.wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box; }
+
+*:focus {
+  outline: none; }
+
+* {
+  box-sizing: border-box; }
+
+html {
+  background: #ff0aff;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; }
+
+body {
+  background: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; }
+
+body:after {
+  font-size: 30px;
+  line-height: 140px;
+  text-align: center;
+  color: #3c100b;
+  background: rgba(255, 255, 255, 0.6);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  height: 140px;
+  margin-left: -200px;
+  margin-top: -70px;
+  border-radius: 5px;
+  z-index: 2; }
+
+body.before-game:after {
+  content: 'Tap the screen to start'; }
+
+body.lose-game:after {
+  content: 'Game Over. Tap to try again'; }
+
+body.beat-level:after {
+  content: 'Level completed! Tap to start next level'; }
+
+body.win-game:after {
+  content: 'You beat the game?! Congratulations!'; }
+
+.pjs-meta {
+  position: absolute;
+  bottom: 10px;
+  right: 20px;
+  text-transform: uppercase;
+  font: 20px/1 monospace;
+  margin: .3em;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.67);
+  z-index: 2; }
+
+#viewport {
+  position: static !important;
+  background: black; }
+
+#turn {
+  display: none; }
+
+@media (orientation: portrait) {
+  #turn {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: #bfbfbf;
+    color: black;
+    z-index: 10;
+    font-weight: 600;
+    font-size: 2em; } }
+#canvas_flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%; }
+
+/*# sourceMappingURL=styles.css.map */

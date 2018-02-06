@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Gonna Stab Someone</title>
+    <link rel="stylesheet" href="./hello_world_requires.css">
+</head>
+
+<body>
+
+    <canvas id="viewport" width="500" height="500"></canvas>
+
+
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+        crossorigin="anonymous"></script>
+    <!--<script src="scripts/require.js"></script>-->
+
+    <script src="./js/physicsjs/physicsjs-full.js"></script>
+    <!--<script src="./scripts/physicsjs/renderers/canvas.js"></script>
+    <script src="./scripts/physicsjs/bodies/rectangle.js"></script>
+    <script src="./scripts/physicsjs/geometries/rectangle.js"></script>-->
+
+    <script>
+        $(document).ready(
+            Physics(function (world) {
+
+                function S(n) {
+                    return n * window.innerWidth / 600;
+                }
+
+                var viewportBounds = Physics.aabb(0, 0, window.innerWidth, window.innerHeight),
+                width = window.innerWidth,
+                height = window.innerHeight;
+
+                var edgeBounce = Physics.behavior('edge-collision-detection', {
+                    aabb: viewportBounds
+                    , restitution: 1
+                    , cof: 0
+                });
+
+                world.add(edgeBounce);
+
+                var renderer = Physics.renderer('canvas', {
+                    el: "viewport", // id of the canvas element
+                    autoResize: true,
+                    width:  width,
+                    height: height,
+                    meta: true
+                });
+                world.add(renderer);
+
+                var i = 100;
+                var circles = [];
+                while(i--){
+                    circles.push(Physics.body('circle', {
+                        x: Math.random() * width
+                        , y: Math.random() * height
+                        , radius: S(5)
+                        , vx: Math.random() * .5 - .25
+                        , vy: Math.random() * .5 - .25
+                        , angularVelocity: Math.random() * .02 - .01 
+                        //, mass: 1
+                        , restitution: 1 
+                        , cof: 0
+                        , styles: {
+                            strokeStyle: '#f4356f'
+                            , fillStyle: '#74f442'
+                            , lineWidth: 1
+                            , angleIndicator: '#ff00ff'
+                        }
+                    }));
+                }
+
+                world.add(circles);
+                world.render();
+
+                world.add([
+                    Physics.behavior('body-impulse-response')
+                    , Physics.behavior('body-collision-detection')
+                    , Physics.behavior('sweep-prune')
+                ]);
+
+                // subscribe to ticker to advance the simulation
+                Physics.util.ticker.on(function (time, dt) {
+                    world.step(time);
+                });
+
+                // start the ticker
+                Physics.util.ticker.start();
+
+                world.on('step', function () {
+                    world.render();
+                });
+
+            })
+        );
+
+    </script>
+
+</body>
+
+</html>
