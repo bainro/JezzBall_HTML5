@@ -31,6 +31,10 @@
         Turn Screen To Play
     </div>
 
+    <div id="cell_container">
+        <!-- 2D Matrix of "cell" elements creating the background grid -->
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
         crossorigin="anonymous"></script>
     <script src="js/require.js"></script>
@@ -56,19 +60,20 @@
                     var init = function init(world, Physics) {
 
                         var width = Math.max($('html').height(), window.innerWidth),
-                            height = Math.min($('html').height(), window.innerWidth);
+                            height = Math.min($('html').height(), window.innerWidth),
+                            unit;
 
                         if (width / height <= 1.5) {
                             //scale canvas to the width
-                            var unit = width / 27;
-                                canvasWidth = width,
-                                canvasHeight = unit * 18;
+                            unit = width / 27;
+                            canvasWidth = width,
+                            canvasHeight = unit * 18;
                         }
                         else {
                             //scale canvas to the height
-                            var unit = height / 18,
-                                canvasWidth = unit * 27,
-                                canvasHeight = height;
+                            unit = height / 18,
+                            canvasWidth = unit * 27,
+                            canvasHeight = height;
                         }
 
                         var viewportBounds = Physics.aabb(0, 0, canvasWidth, canvasHeight);
@@ -90,14 +95,19 @@
                         });
                         world.add(renderer);
 
-                        //add the 27*18 (486) matrix using a DOM ele for each cell
-
+                        $('#cell_container').css('top', $('#viewport').position().top).css('left', $('#viewport').position().left).height(18 * unit).width(27 * unit);
+                        
+                        //add the 27*18 (486) matrix using a DOM element for each cell
+                        
                         var cells = []; //need 2d array...
 
                         for(i = 0; i < 27; i++){
                             var row = [];
                             for(j = 0; j < 18; j++){
-                                row.push($('<span>'));
+                                var cell = $('<span>').addClass('cell').height(unit).width(unit).css('top', j * unit).css('left', i * unit);
+                                $('#cell_container').append(cell);
+                                row.push(cell);
+                                console.log($('#viewport').position().top);
                             }
                             cells.push(row); //$('<span>')
                         }

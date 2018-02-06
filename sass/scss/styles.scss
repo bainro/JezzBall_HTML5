@@ -5,7 +5,7 @@
 //styles
 
 html{
-    background: #ff0aff;
+    background: #ffd4ff;
     padding: 0;
     margin: 0;
     width: 100%;
@@ -71,7 +71,8 @@ body.win-game:after {
 
 #viewport{
     position: static !important;
-    background: black;
+    //background: black;
+    z-index: 2 !important;
 }
 
 #turn{
@@ -101,4 +102,17 @@ body.win-game:after {
     justify-content:    center;
     align-items:        center;
     height:             100%;
+}
+
+.cell{
+    background:   gray;
+    position:       absolute;
+    z-index:        1;
+    border:         1px solid rgb(0, 0, 0);
+    border-radius:  4px; 
+}
+
+#cell_container{
+    position:   absolute;
+    //background: ;
 }
