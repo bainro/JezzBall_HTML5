@@ -44,13 +44,20 @@ define(
                     this.live = true;
                     this.growth = .5;
                     this.gameType = "climber";
+                    view = new Image();
+                    view.src = ('./images/red.svg');
+                    view.width = this.geometry.width;
+                    this.view = view;
+                    this.cellLoc = options.cell;
                 },
 
                 // Makes climber grow
                 grow: function () {
+
                     this.geometry.height += this.growth;
                     //need view to be recalculated each time growth occurs...
 
+                    //don't need this I think... can use .add() instead
                     var scratch = Physics.scratchpad();
                     var v = scratch.vector().set(
                         0,
@@ -66,10 +73,29 @@ define(
 
                 die: function () {
                     
-                    console.log('Bleh! I died :(');
-                    var world = this._world;
+                    var world = this._world,
+                        //cell = cells[this.cellLoc[0]][this.cellLoc[1]],
+                        cell_num = this.geometry.height / unit;
+
+                    //$(cell).detach();
+                    for (var i = 0; i <= cell_num; i++) {
+                        $(cells[ this.cellLoc[ 0 ] ][ this.cellLoc[ 1 ] - i ]).detach();
+                    }
+
+                    var dead_copy = Physics.body('rectangle', {
+                        x: this.aabb().x
+                        , y: this.aabb().y
+                        , height: this.geometry.height
+                        , width: this.geometry.width
+                        , restitution: 1
+                        , cof: 0
+                        , treatment: 'static'
+                        , styles: {
+                            fillStyle: 'rgba(0,0,0,0)'
+                        }
+                    });
                     world.removeBody(this);
-                    //climber1 = null;
+                    world.addBody(dead_copy)
 
                     return;
                 },
