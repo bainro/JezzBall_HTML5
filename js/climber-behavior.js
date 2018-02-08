@@ -28,7 +28,7 @@ define(
                     world.on('integrate:positions', this.behave, this);
                 },
 
-                disconnet: function (world) {
+                disconnect: function (world) {
                     // unsub from world events
                     world.off('collisions:detected', this.checkClimberCollision, this);
                     world.off('integrate:positions', this.behave, this);
@@ -38,8 +38,7 @@ define(
 
                     //console.log(data);
 
-                    var self = this
-                        , world = self._world
+                    var world = this._world
                         , collisions = data.collisions
                         , col
                         ;
@@ -47,17 +46,24 @@ define(
                     for (var i = 0, l = collisions.length; i < l; ++i) {
                         col = collisions[i];
 
-                        // 
-                        if (col.bodyA.gameType !== 'circle' &&
-                            col.bodyB.gameType !== 'circle' &&
+                        if ((col.bodyA.gameType === 'circle' || col.bodyB.gameType === 'circle') &&
                             (col.bodyA.gameType === 'climber' || col.bodyB.gameType === 'climber')
                         ) {
-                            console.log('Climber hit border');
-                            /*player.blowUp();
+
+                            if (col.bodyA.gameType === 'climber') {
+                                world.removeBody(col.bodyA);
+                            }
+                            else {
+                                world.removeBody(col.bodyB);
+                            }
+
+                            //Glitch hint: climber gets removed from the world, but still calls .die() upon 
+                            //reaching the top... Prob bcuz it couldn't remove the behavior. Prehaps removing
+                            //behavior from world vs removing from bodies??? 
+                            //If first climber is collided with, no errors are created...
+
                             world.removeBehavior(this);
-                            // when we crash, we'll publish an event to the world
-                            // that we can listen for to prompt to restart the game
-                            world.emit('lose-game');*/
+
                             return;
                         }
                     }
