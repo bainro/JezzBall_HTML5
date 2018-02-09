@@ -125,13 +125,13 @@
                                 , vx: randomVelocity
                                 , vy: (0.0625 - randomVelocity ** 2) ** 0.5 * plusOrMinus
                                 , angularVelocity: Math.random() * .02 - .01
-                                //, mass: 1
+                                , mass: 0.001
                                 , restitution: 1
                                 , cof: 0
                                 , styles: {
                                     strokeStyle: '#f4356f'
                                     , fillStyle: '#74f442'
-                                    , lineWidth: 1
+                                    //, lineWidth: 1
                                     , angleIndicator: '#ff00ff'
                                 }
                             });
@@ -167,31 +167,37 @@
                             climber1 = Physics.body('climber', {
                                 x: cell.position().left + unit / 2
                                 , y: cell.position().top + unit / 4
+                                , vy: -0.5/12
                                 , height: unit / 2
-                                , width: unit
+                                , width: unit -1
                                 , restitution: 1
                                 , cof: 0
                                 , cell: [row, column]
-                                , treatment: 'static'
-                                , direction: 'N'
+                                , treatment: 'dynamic'
+                                , mass: 100000
+                                , dir: 'N'
                                 , styles: {
                                     fillStyle: 'red',
                                     strokeStyle: 'red'
                                 }
                             });
-                            /*var climber2 = Physics.body('climber', {
+                            var climber2 = Physics.body('climber', {
                                 x: cell.position().left + unit / 2
                                 , y: cell.position().top + unit / 1.3333
+                                , vy: .5 / 12 //+ .001
                                 , height: unit / 2
-                                , width: unit
+                                , width: unit - 1
                                 , restitution: 1
                                 , cof: 0
-                                , direction: 'S'
-                                , treatment: 'static'
+                                , cell: [row, column]
+                                , treatment: 'dynamic'
+                                , mass: 100000
+                                , dir: 'S'
                                 , styles: {
-                                     fillStyle: 'blue'
+                                     fillStyle: 'blue',
+                                     strokeStyle: 'blue'
                                 }
-                            });*/
+                            });
                             
                             //var live_climbers = [];
                             // add bodies to the boxes array..
@@ -200,8 +206,12 @@
                             // only apply gravity to the bodies in the boxes array
                             var climber_phy = Physics.behavior('climber-behavior')
                                 .applyTo([climber1]);
-
                             world.addBody(climber1);
+                            world.add(climber_phy);
+
+                            climber_phy = Physics.behavior('climber-behavior')
+                                .applyTo([climber2]);
+                            world.addBody(climber2);
                             world.add(climber_phy);
 
                             

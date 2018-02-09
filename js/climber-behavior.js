@@ -16,7 +16,7 @@ define(
                     parent.init.call(this, options);
 
                     // events
-                    document.addEventListener('keydown', function (e) {});
+                    //document.addEventListener('keydown', function (e) {});
 
                 },
 
@@ -47,7 +47,7 @@ define(
                         col = collisions[i];
 
                         if ((col.bodyA.gameType === 'circle' || col.bodyB.gameType === 'circle') &&
-                            (col.bodyA.gameType === 'climber' || col.bodyB.gameType === 'climber')
+                            (col.bodyA === this.getTargets()[0] || col.bodyB === this.getTargets()[0])
                         ) {
 
                             if (col.bodyA.gameType === 'climber') {
@@ -57,29 +57,33 @@ define(
                                 world.removeBody(col.bodyB);
                             }
 
-                            //Glitch hint: climber gets removed from the world, but still calls .die() upon 
-                            //reaching the top... Prob bcuz it couldn't remove the behavior. Prehaps removing
-                            //behavior from world vs removing from bodies??? 
-                            //If first climber is collided with, no errors are created...
-
                             world.removeBehavior(this);
 
                             return;
+                        }
+                        else if ((col.bodyA.gameType === 'dead_climber' || col.bodyB.gameType === 'dead_climber') &&
+                                 (col.bodyA === this.getTargets()[0] || col.bodyB === this.getTargets()[0])
+                        ) {
+                            //console.log('I touched a dead person');
+                            this.getTargets()[0].die();
+                            world.removeBehavior(this);
                         }
                     }
                 },
 
                 behave: function () {
-                    var climbers = this.getTargets(),
+                    //can pass in climber obj during behav init and pass fx to set this method to dynamically
                     world = this._world;
-                    for (var i = 0; i < climbers.length; i++){
-                        climbers[i].grow();
-                        if ( climbers[i].aabb().y - climbers[i].geometry.height/2 < 0 ) {
-                            climbers[i].die();
+
+                        this.getTargets()[0].grow();
+                        //depends on direction
+                        if (this.getTargets()[0].aabb().y - this.getTargets()[0].geometry.height/2 < 0 || 
+                            this.getTargets()[0].aabb().y + this.getTargets()[0].geometry.height / 2 > canvasHeight
+                        ) {
+                            this.getTargets()[0].die();
                             world.removeBehavior(this);
                         }
-                        //console.log(climbers[i].aabb().y);
-                    }
+                        
                 },
 
             };

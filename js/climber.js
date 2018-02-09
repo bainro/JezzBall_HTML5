@@ -40,12 +40,23 @@ define(
 
                 init: function (options) {
                     parent.init.call(this, options);
-                    this.direction = options.direction;
+                    this.dir = options.dir;
                     this.live = true;
                     this.growth = .5;
                     this.gameType = "climber";
                     view = new Image();
-                    view.src = ('./images/red.svg');
+                    switch (this.dir) {
+                        case 'N': // North
+                            view.src = ('./images/red.svg');
+                            break;
+                        case 'E': // East
+                            break;
+                        case 'S': // South
+                            view.src = ('./images/blue.svg');
+                            break;
+                        case 'W': // West
+                            break;
+                    }
                     view.width = this.geometry.width;
                     this.view = view;
                     this.cellLoc = options.cell;
@@ -54,19 +65,10 @@ define(
                 // Makes climber grow
                 grow: function () {
 
+                    //need view to be updated each time growth occurs...
                     this.geometry.height += this.growth;
-                    //need view to be recalculated each time growth occurs...
-
-                    //don't need this I think... can use .add() instead
-                    var scratch = Physics.scratchpad();
-                    var v = scratch.vector().set(
-                        0,
-                        -this.growth/2
-                    );
-
                     $(this.view).attr('height', this.geometry.height);
-                    this.state.pos = this.state.pos.vadd(v);
-                    scratch.done();
+                    //this.state.pos = this.state.pos.add(-this.growth/2);
 
                     return this;
                 },
@@ -77,23 +79,50 @@ define(
                         //cell = cells[this.cellLoc[0]][this.cellLoc[1]],
                         cell_num = this.geometry.height / unit;
 
-                    //$(cell).detach();
-                    for (var i = 0; i <= cell_num; i++) {
-                        $(cells[ this.cellLoc[ 0 ] ][ this.cellLoc[ 1 ] - i ]).detach();
+                    //depends on dir
+                    switch (this.dir) {
+                        case 'N':
+                            for (var i = 0; i <= cell_num; i++) {
+                                $(cells[ this.cellLoc[ 0 ] ][ this.cellLoc[ 1 ] - i ]).detach();
+                            }
+                            var dead_copy = Physics.body('rectangle', {
+                                x: this.aabb().x
+                                , y: this.aabb().y + unit / 4
+                                , height: this.geometry.height + unit / 2
+                                , width: this.geometry.width
+                                , restitution: 1
+                                , cof: 0
+                                , treatment: 'static'
+                                //, mass: 100000
+                                , styles: {
+                                    fillStyle: 'rgba(0,0,0,0)'
+                                }
+                            });
+                            break;
+                        case 'S':
+                            for (var i = 0; i <= cell_num; i++) {
+                                $(cells[this.cellLoc[0]][this.cellLoc[1] + i]).detach();
+                            }
+                            var dead_copy = Physics.body('rectangle', {
+                                x: this.aabb().x
+                                , y: this.aabb().y - unit / 4
+                                , height: this.geometry.height + unit / 2
+                                , width: this.geometry.width
+                                , restitution: 1
+                                , cof: 0
+                                , treatment: 'static'
+                                //, mass: 100000
+                                , styles: {
+                                    fillStyle: 'rgba(0,0,0,0)'
+                                }
+                            });
+                            break;
+                        default:
+                            console.log('You need to code switch in climber.die()');
+                            break;
                     }
-
-                    var dead_copy = Physics.body('rectangle', {
-                        x: this.aabb().x
-                        , y: this.aabb().y + unit/4
-                        , height: this.geometry.height + unit/2
-                        , width: this.geometry.width
-                        , restitution: 1
-                        , cof: 0
-                        , treatment: 'static'
-                        , styles: {
-                            fillStyle: 'rgba(0,0,0,0)'
-                        }
-                    });
+                    
+                    dead_copy.gameType = 'dead_climber';
                     world.removeBody(this);
                     world.addBody(dead_copy)
 
