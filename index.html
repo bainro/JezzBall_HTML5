@@ -69,13 +69,13 @@
                             //scale canvas to the width
                             unit = width / 27;
                             canvasWidth = width,
-                            canvasHeight = unit * 18;
+                                canvasHeight = unit * 18;
                         }
                         else {
                             //scale canvas to the height
                             unit = height / 18,
-                            canvasWidth = unit * 27,
-                            canvasHeight = height;
+                                canvasWidth = unit * 27,
+                                canvasHeight = height;
                         }
 
                         var viewportBounds = Physics.aabb(0, 0, canvasWidth, canvasHeight);
@@ -98,14 +98,14 @@
                         world.add(renderer);
 
                         $('#cell_container').css('top', $('#viewport').position().top).css('left', $('#viewport').position().left).height(18 * unit).width(27 * unit);
-                        
+
                         //add the 27*18 (486) matrix using a DOM element for each cell
-                        
+
                         cells = []; //need 2d array...
 
-                        for(i = 0; i < 27; i++){
+                        for (i = 0; i < 27; i++) {
                             var row = [];
-                            for(j = 0; j < 18; j++){
+                            for (j = 0; j < 18; j++) {
                                 var cell = $('<span>').addClass('cell').height(unit).width(unit).css('top', j * unit).css('left', i * unit);
                                 $('#cell_container').append(cell);
                                 row.push(cell);
@@ -117,7 +117,7 @@
                         var circles = [];
                         while (i--) {
                             var plusOrMinus = Math.random() < 0.5 ? -1 : 1;
-                            var randomVelocity = Math.random() * .25 - .125; 
+                            var randomVelocity = Math.random() * .25 - .125;
                             var circle = Physics.body('circle', {
                                 x: Math.random() * canvasWidth
                                 , y: Math.random() * canvasHeight
@@ -158,67 +158,71 @@
 
                         //click event handlers to create climbers, add them to the world over the correct cell
                         $('#viewport').on('click', (e) => {
-                            
+
                             //Figure out which cell was clicked
                             var row = Math.round(((e.clientX - $('#viewport').position().left) - unit * .5) / unit),
                                 column = Math.round(((e.clientY - $('#viewport').position().top) - unit * .5) / unit),
                                 cell = cells[row][column];
 
-                            climber1 = Physics.body('climber', {
-                                x: cell.position().left + unit / 2
-                                , y: cell.position().top + unit / 4
-                                , vy: -0.5/12
-                                , height: unit / 2
-                                , width: unit -1
-                                , restitution: 1
-                                , cof: 0
-                                , cell: [row, column]
-                                , treatment: 'dynamic'
-                                , mass: 100000
-                                , dir: 'N'
-                                , styles: {
-                                    fillStyle: 'red',
-                                    strokeStyle: 'red'
+                            if (column > 0 && $.contains(document.getElementById('cell_container'), $(cells[row][column - 1])[0])) {
+                                climber1 = Physics.body('climber', {
+                                    x: cell.position().left + unit / 2
+                                    , y: cell.position().top + unit / 4 + unit / 2 - 1
+                                    , vy: -0.5 / 12
+                                    , height: unit / 2
+                                    , width: unit - 1
+                                    , restitution: 1
+                                    , cof: 0
+                                    , cell: [row, column]
+                                    , treatment: 'dynamic'
+                                    , mass: 100000
+                                    , dir: 'N'
+                                    , styles: {
+                                        fillStyle: 'red',
+                                        strokeStyle: 'red'
+                                    }
+                                });
+
+                                var climber_phy = Physics.behavior('climber-behavior')
+                                    .applyTo([climber1]);
+                                world.addBody(climber1);
+                                world.add(climber_phy);
+
+                            }
+
+                            if (column < 17 && $.contains(document.getElementById('cell_container'), $(cells[row][column + 1])[0])) {
+                                
+                                var y_pos = cell.position().top + unit / 1.3333 + unit / 2 + 1;
+                                
+                                if (!$.contains(document.getElementById('cell_container'), $(cells[row][column - 1])[0])) {
+                                    y_pos = cell.position().top + unit / 1.3333 - unit / 2 + 1;
                                 }
-                            });
-                            var climber2 = Physics.body('climber', {
-                                x: cell.position().left + unit / 2
-                                , y: cell.position().top + unit / 1.3333
-                                , vy: .5 / 12 //+ .001
-                                , height: unit / 2
-                                , width: unit - 1
-                                , restitution: 1
-                                , cof: 0
-                                , cell: [row, column]
-                                , treatment: 'dynamic'
-                                , mass: 100000
-                                , dir: 'S'
-                                , styles: {
-                                     fillStyle: 'blue',
-                                     strokeStyle: 'blue'
-                                }
-                            });
-                            
-                            //var live_climbers = [];
-                            // add bodies to the boxes array..
-                            //live_climbers.push(climber1);
 
-                            // only apply gravity to the bodies in the boxes array
-                            var climber_phy = Physics.behavior('climber-behavior')
-                                .applyTo([climber1]);
-                            world.addBody(climber1);
-                            world.add(climber_phy);
+                                climber2 = Physics.body('climber', {
+                                    x: cell.position().left + unit / 2
+                                    , y: y_pos
+                                    , vy: .5 / 12 //+ .001
+                                    , height: unit / 2
+                                    , width: unit - 1
+                                    , restitution: 1
+                                    , cof: 0
+                                    //the column # depends on whether a cell lies below the originally clicked cell
+                                    , cell: [row, column + ($.contains(document.getElementById('cell_container'), $(cells[row][column - 1])[0]) ? 1 : 0)]
+                                    , treatment: 'dynamic'
+                                    , mass: 100000
+                                    , dir: 'S'
+                                    , styles: {
+                                        fillStyle: 'blue',
+                                        strokeStyle: 'blue'
+                                    }
+                                });
 
-                            climber_phy = Physics.behavior('climber-behavior')
-                                .applyTo([climber2]);
-                            world.addBody(climber2);
-                            world.add(climber_phy);
-
-                            
-                            
-                            //cell.detach();
+                                climber_phy = Physics.behavior('climber-behavior')
+                                    .applyTo([climber2]);
+                                world.addBody(climber2);
+                                world.add(climber_phy);
+                            }
                         });
-
                     }
 
                     var inGame = false;

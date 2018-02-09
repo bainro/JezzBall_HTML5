@@ -87,7 +87,7 @@ define(
                             }
                             var dead_copy = Physics.body('rectangle', {
                                 x: this.aabb().x
-                                , y: this.aabb().y + unit / 4
+                                , y: this.aabb().y - unit / 4 - 1
                                 , height: this.geometry.height + unit / 2
                                 , width: this.geometry.width
                                 , restitution: 1
@@ -105,7 +105,7 @@ define(
                             }
                             var dead_copy = Physics.body('rectangle', {
                                 x: this.aabb().x
-                                , y: this.aabb().y - unit / 4
+                                , y: this.aabb().y /*- unit / 4*/ + unit / 4 + 1
                                 , height: this.geometry.height + unit / 2
                                 , width: this.geometry.width
                                 , restitution: 1
