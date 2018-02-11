@@ -16,8 +16,9 @@ define(
                     this.dir = options.dir;
                     this.growth = .5;
                     this.gameType = "climber";
-                    view.width = this.geometry.width;
+                    this.source_cell = options.cell;
                     view = new Image();
+                    view.width = this.geometry.width;
                     switch (this.dir) {
                         case 'N': // North
                             view.src = ('./images/red.svg');
