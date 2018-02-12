@@ -70,7 +70,9 @@ define(
                     this.getTargets()[0].grow();
                     //if the climber reaches the viewport border
                     if (this.getTargets()[0].aabb().y - this.getTargets()[0].geometry.height / 2 < 0 ||
-                        this.getTargets()[0].aabb().y + this.getTargets()[0].geometry.height / 2 > canvasHeight
+                        this.getTargets()[0].aabb().y + this.getTargets()[0].geometry.height / 2 > canvasHeight ||
+                        this.getTargets()[0].aabb().x - this.getTargets()[0].geometry.width / 2 < 0 ||
+                        this.getTargets()[0].aabb().x + this.getTargets()[0].geometry.width / 2 > canvasWidth
                     ) {
                         this.getTargets()[0].die();
 
