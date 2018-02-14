@@ -127,7 +127,9 @@ body.win-game:after {
 
 #cell_container {
   position: absolute;
-  background: url("../../images/staredad.jpg") no-repeat;
-  background-size: cover; }
+  background: url("../../images/dream.jpg") no-repeat;
+  background-size: contain;
+  background-position: center;
+  background-color: black; }
 
 /*# sourceMappingURL=styles.css.map */

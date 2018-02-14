@@ -6,6 +6,39 @@ define(
         Physics
     ) {
 
+        //If the referenced cell is real, not marked as true, and still attached to the DOM
+        function flood_mark(indexes) {
+            if (indexes[0] >= 0 && indexes[0] <= 26 && indexes[1] >= 0 && indexes[1] <= 17
+                && $(cells[indexes[0]][indexes[1]]).data('marked') === false
+                && $.contains(document.getElementById('cell_container'), $(cells[indexes[0]][indexes[1]])[0])
+            ) {
+                $(cells[indexes[0]][indexes[1]]).data('marked', true);
+
+                //recursive calls passing each adjacent cell
+                flood_mark([indexes[0] + 1, indexes[1]]);
+                flood_mark([indexes[0] - 1, indexes[1]]);
+                flood_mark([indexes[0], indexes[1] - 1]);
+                flood_mark([indexes[0], indexes[1] + 1]);
+            }
+            return;
+        }
+
+        function remove_unmarked() {
+            for (var i = 0; i < 27; i++) {
+                for (var j = 0; j < 18; j++) {
+                    if ($(cells[i][j]).data('marked') === false) {
+                        //remove all cells not marked as visited
+                        $(cells[i][j]).detach();
+                        //console.log(i,j);
+                    }
+                    else {
+                        //or unset data-visited 
+                        $(cells[i][j]).data('marked', false);
+                    }
+                }
+            }
+        }
+
         return Physics.behavior('climber-behavior', function (parent) {
 
             return {
@@ -55,6 +88,20 @@ define(
                             (col.bodyA === this.getTargets()[0] || col.bodyB === this.getTargets()[0])
                         ) {
                             this.getTargets()[0].die();
+
+                            var balls = world.find(Physics.query({
+                                name: 'circle'
+                            }));
+
+                            for (var i = 0; i < balls.length; i++) {
+                                //get coord's and convert to matrix indexes
+                                col = Math.round((balls[i].aabb().x - unit / 2) / unit);
+                                row = Math.round((balls[i].aabb().y - unit / 2) / unit);
+                                //$(cells[col][row]).detach(); //<- proving wrong ball cell calc
+                                flood_mark([col, row]);
+                            }
+
+                            remove_unmarked();
                             world.removeBehavior(this);
                         }
                     }
@@ -82,42 +129,14 @@ define(
 
                         for (var i = 0; i < balls.length; i++) {
                             //get coord's and convert to matrix indexes
-                            col = Math.round(balls[i].state.pos.x / unit);
-                            row = Math.round(balls[i].state.pos.y / unit);
+                            col = Math.round((balls[i].aabb().x - unit / 2) / unit); 
+                            row = Math.round((balls[i].aabb().y - unit / 2) / unit); 
+                            //$(cells[col][row]).detach(); //<- proving wrong ball cell calc
                             flood_mark([col, row]);
                         }
 
-                        for (var i = 0; i < 27; i++) {
-                            for (var j = 0; j < 18; j++) {
-                                if ($(cells[i][j]).data('marked') != 'true') {
-                                    //remove all cells not marked as visited
-                                    $(cells[i][j]).detach();
-                                }
-                                else {
-                                    //or unset data-visited 
-                                    $(cells[i][j]).data('marked', 'false');
-                                }
-                            }
-                        }
-
+                        remove_unmarked();
                         world.removeBehavior(this);
-
-                        //If the referenced cell is real, not marked as true, and still attached to the DOM
-                        function flood_mark(indexes) {
-                            if (indexes[0] >= 0 && indexes[0] <= 26 && indexes[1] >= 0 && indexes[1] <= 17
-                                && $(cells[indexes[0]][indexes[1]]).data('marked') != 'true'
-                                && $.contains(document.getElementById('cell_container'), $(cells[indexes[0]][indexes[1]])[0])
-                            ) {
-                                $(cells[indexes[0]][indexes[1]]).data('marked', 'true');
-
-                                //recursive calls passing each adjacent cell
-                                flood_mark([indexes[0] + 1, indexes[1]]);
-                                flood_mark([indexes[0] - 1, indexes[1]]);
-                                flood_mark([indexes[0], indexes[1] - 1]);
-                                flood_mark([indexes[0], indexes[1] + 1]);
-                            }
-                            return;
-                        }
 
                     }
                 },
