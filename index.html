@@ -108,7 +108,7 @@
                         for (i = 0; i < 27; i++) {
                             var col = [];
                             for (j = 0; j < 18; j++) {
-                                var cell = $('<span>').addClass('cell').height(unit).width(unit).css('top', j * unit).css('left', i * unit);
+                                var cell = $('<span>').addClass('cell').height(unit).width(unit).css('top', j * unit).css('left', i * unit).data('marked', false);
                                 $('#cell_container').append(cell);
                                 col.push(cell);
                             }
@@ -124,9 +124,9 @@
                                 x: Math.random() * canvasWidth
                                 , y: Math.random() * canvasHeight
                                 , radius: unit / 2 - .5
-                                , vx: random_velocity
-                                , vy: (0.0625 - random_velocity ** 2) ** 0.5 * plus_or_minus
-                                , angularVelocity: Math.random() * .02 - .01
+                                //, vx: random_velocity
+                                //, vy: (0.0625 - random_velocity ** 2) ** 0.5 * plus_or_minus
+                                //, angularVelocity: Math.random() * .02 - .01
                                 , mass: 0.001
                                 , restitution: 1
                                 , cof: 0
@@ -157,7 +157,6 @@
                         $('html').on('mouseup', function (e) {
                             if (e.which == 3) {
                                 direction = !direction;
-                                console.log(direction);
                             }
                         });
 
@@ -230,7 +229,7 @@
                                             }
                                         });
 
-                                        climber_phy = Physics.behavior('climber-behavior')
+                                        var climber_phy = Physics.behavior('climber-behavior')
                                             .applyTo([climber2]);
                                         world.addBody(climber2);
                                         world.add(climber_phy);
@@ -264,7 +263,7 @@
                                             }
                                         });
 
-                                        climber_phy = Physics.behavior('climber-behavior')
+                                        var climber_phy = Physics.behavior('climber-behavior')
                                             .applyTo([climber2]);
                                         world.addBody(climber2);
                                         world.add(climber_phy);
