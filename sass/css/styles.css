@@ -57,7 +57,7 @@ body:after {
   top: 0;
   left: 0; }
 
-body.before-game:after {
+body.before_game:after {
   content: 'Tap the screen to start'; }
 
 body.lose-game:after {
@@ -68,6 +68,17 @@ body.beat-level:after {
 
 body.win-game:after {
   content: 'You beat the game?! Congratulations!'; }
+
+#between_lvl_screen {
+  color: #3c100b;
+  background: rgba(255, 255, 255, 0.84);
+  z-index: 2;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 140px;
+  text-align: center;
+  padding: 0 1em;
+  border-radius: 15px; }
 
 .pjs-meta {
   position: absolute;
@@ -86,6 +97,12 @@ body.win-game:after {
 
 #turn {
   display: none; }
+  #turn #turn_inside {
+    max-width: 88%;
+    text-align: center;
+    padding: .5em;
+    background: rgba(255, 255, 255, 0.69);
+    border-radius: 15px; }
 
 @media (orientation: portrait) {
   #turn {
@@ -97,11 +114,12 @@ body.win-game:after {
     left: 0;
     height: 100%;
     width: 100%;
-    background: #bfbfbf;
+    background: #473a3a;
     color: black;
     z-index: 10;
     font-weight: 600;
-    font-size: 2em; }
+    font-size: 2em;
+    border-radius: 40px; }
 
   #cell_container {
     max-width: 100%;

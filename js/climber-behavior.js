@@ -43,71 +43,76 @@ define(
                     console.log('YOU WON');
                 }
                 else {
-                    $(document.body).addClass('beat-level');
+                    $('#between_lvl_screen').css('zIndex', '2').html('Lvl ' + lvl + ' completed! Tap to continue');
+                    $('#between_lvl_screen').center();
                     self_destruct = true;
-                    $(document).on('click touchend', (e) => {
-                        $(document.body).removeClass('beat-level');
-                        self_destruct = false;
 
-                        var balls = world.find(Physics.query({
-                            name: 'circle'
-                        }));
+                    setTimeout(function () {
+                        $(document).on('click touchend', (e) => {
 
-                        var climbers = world.find(Physics.query({
-                            name: 'climber'
-                        }));
+                            $('#between_lvl_screen').css('zIndex', '-1');
+                            self_destruct = false;
 
-                        var dead_climbers = world.find(Physics.query({
-                            name: 'rectangle'
-                        }));
+                            var balls = world.find(Physics.query({
+                                name: 'circle'
+                            }));
 
-                        world.remove(balls);
-                        world.remove(dead_climbers);
-                        world.remove(climbers);
+                            var climbers = world.find(Physics.query({
+                                name: 'climber'
+                            }));
 
-                        for (i = 0; i < 27; i++) {
-                            for (j = 0; j < 18; j++) {
-                                $('#cell_container').append(cells[i][j]); //.data('marked', false);
-                            }
-                        }
+                            var dead_climbers = world.find(Physics.query({
+                                name: 'rectangle'
+                            }));
 
-                        $('#cell_container').css(
-                            {
-                                background: 'url("./images/staredad.jpg") no-repeat',
-                                backgroundSize: "contain",
-                                backgroundPosition: "center",
-                                backgroundColor: "black"
-                            });
+                            world.remove(balls);
+                            world.remove(dead_climbers);
+                            world.remove(climbers);
 
-                        var i = lvl + 1;
-                        var balls = [];
-                        while (i--) {
-                            var plus_or_minus = Math.random() < 0.5 ? -1 : 1;
-                            var random_velocity = Math.random() * .25 - .125;
-                            var ball = Physics.body('circle', {
-                                x: Math.random() * canvasWidth
-                                , y: Math.random() * canvasHeight
-                                , radius: unit / 2 - .5
-                                , vx: random_velocity
-                                , vy: (0.0625 - random_velocity ** 2) ** 0.5 * plus_or_minus
-                                , angularVelocity: Math.random() * .02 - .01
-                                , mass: 0.001
-                                , restitution: 1
-                                , cof: 0
-                                , styles: {
-                                    strokeStyle: '#f4356f'
-                                    , fillStyle: 'black'
-                                    , angleIndicator: '#ff00ff'
+                            for (i = 0; i < 27; i++) {
+                                for (j = 0; j < 18; j++) {
+                                    $('#cell_container').append(cells[i][j]); //.data('marked', false);
                                 }
-                            });
-                            ball.gameType = 'circle';
-                            balls.push(ball);
-                        }
+                            }
 
-                        world.add(balls);
+                            $('#cell_container').css(
+                                {
+                                    background: 'url("./images/staredad.jpg") no-repeat',
+                                    backgroundSize: "contain",
+                                    backgroundPosition: "center",
+                                    backgroundColor: "black"
+                                });
 
-                        $(document).off('click touchend');
-                    });
+                            var i = lvl + 1;
+                            var balls = [];
+                            while (i--) {
+                                var plus_or_minus = Math.random() < 0.5 ? -1 : 1;
+                                var random_velocity = Math.random() * .25 - .125;
+                                var ball = Physics.body('circle', {
+                                    x: Math.random() * canvasWidth
+                                    , y: Math.random() * canvasHeight
+                                    , radius: unit / 2 - .5
+                                    , vx: random_velocity
+                                    , vy: (0.0625 - random_velocity ** 2) ** 0.5 * plus_or_minus
+                                    , angularVelocity: Math.random() * .02 - .01
+                                    , mass: 0.001
+                                    , restitution: 1
+                                    , cof: 0
+                                    , styles: {
+                                        strokeStyle: '#f4356f'
+                                        , fillStyle: 'black'
+                                        , angleIndicator: '#ff00ff'
+                                    }
+                                });
+                                ball.gameType = 'circle';
+                                balls.push(ball);
+                            }
+
+                            world.add(balls);
+
+                            $(document).off('click touchend');
+                        });
+                    }, 250);
                 }
 
                 lvl++;

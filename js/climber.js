@@ -134,9 +134,13 @@ define(
                     }
 
                     dead_copy.gameType = 'dead_climber';
-                    world.removeBody(this);
-                    world.addBody(dead_copy);
-
+                    try{
+                        world.removeBody(this);
+                        world.addBody(dead_copy);
+                    }
+                    catch (err) {
+                        console.log("Tried removing climber that wasn't there");
+                    }
                     return;
                 },
 
