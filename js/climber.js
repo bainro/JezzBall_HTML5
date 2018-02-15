@@ -111,8 +111,25 @@ define(
                                 }
                             });
                             break;
+                        case 'W':
+                            var num_of_cells = Math.ceil(this.geometry.width / unit);
+                            for (var i = 0; i < num_of_cells; i++) {
+                                $(cells[this.source_cell[0] - i][this.source_cell[1]]).data('marked', false).detach();
+                            }
+                            var dead_copy = Physics.body('rectangle', {
+                                x: this.aabb().x - unit / 4 + 1
+                                , y: this.aabb().y /*- unit / 4*/
+                                , height: this.geometry.height
+                                , width: this.geometry.width + unit / 2
+                                , restitution: 1
+                                , cof: 0
+                                , treatment: 'static'
+                                , styles: {
+                                    fillStyle: 'rgba(0,0,0,0)'
+                                }
+                            });
+                            break;
                         default:
-                            console.log('You need to code this switch in climber.die()');
                             break;
                     }
 

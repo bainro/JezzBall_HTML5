@@ -45,20 +45,17 @@ body {
   overflow: hidden; }
 
 body:after {
-  font-size: 30px;
+  font-size: 25px;
   line-height: 140px;
   text-align: center;
   color: #3c100b;
   background: rgba(255, 255, 255, 0.6);
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 400px;
-  height: 140px;
-  margin-left: -200px;
-  margin-top: -70px;
+  padding: 0 1em;
   border-radius: 5px;
-  z-index: 2; }
+  z-index: 2;
+  top: 0;
+  left: 0; }
 
 body.before-game:after {
   content: 'Tap the screen to start'; }

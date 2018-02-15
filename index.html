@@ -35,8 +35,8 @@
         <!-- 2D Matrix of "cell" elements creating the background grid -->
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
-        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" crossorigin="anonymous"></script>
+    <script src="./js/jquery-mobile.js"></script>
     <script src="js/require.js"></script>
 
 
@@ -65,7 +65,9 @@
                             height = Math.min($('html').height(), window.innerWidth),
                             climber1,
                             climber2,
-                            direction = true; // North-South Climbers
+                            up_down_dir = true;
+                        lvl = 1; //globals
+                        self_destruct = false;
 
                         if (width / height <= 1.5) {
                             //scale canvas to the width
@@ -153,11 +155,15 @@
                             world.render();
                         });
 
-                        //switch direction of climbers
+                        //switch up_down_dir of climbers
                         $('html').on('mouseup', function (e) {
                             if (e.which == 3) {
-                                direction = !direction;
+                                up_down_dir = !up_down_dir;
                             }
+                        });
+
+                        $('html').on('swipe', function () {
+                            up_down_dir = !up_down_dir;
                         });
 
                         //create climbers
@@ -168,66 +174,92 @@
                                 row = Math.round(((e.clientY - $('#viewport').position().top) - unit * .5) / unit),
                                 cell = cells[col][row];
 
-                            if (direction === true) {
+                            if (up_down_dir === true) {
 
-                                    if (!world.has(climber1) && row > 0 && ($.contains(document.getElementById('cell_container'), $(cells[col][row - 1])[0]) || !$.contains(document.getElementById('cell_container'), $(cells[col][row + 1])[0]))) {
-                                        climber1 = Physics.body('climber', {
-                                            x: cell.position().left + unit / 2
-                                            , y: cell.position().top + unit / 4 + unit / 2 - 1
-                                            , vy: -0.5 / 12
-                                            , height: unit / 2
-                                            , width: unit - 1
-                                            , restitution: 1
-                                            , cof: 0
-                                            , cell: [col, row]
-                                            , treatment: 'dynamic'
-                                            , mass: 100000
-                                            , dir: 'N'
-                                            , styles: {
-                                                fillStyle: 'red',
-                                                strokeStyle: 'red'
-                                            }
-                                        });
-
-                                        var climber_phy = Physics.behavior('climber-behavior')
-                                            .applyTo([climber1]);
-                                        world.addBody(climber1);
-                                        world.add(climber_phy);
-                                    }
-
-                                    if (!world.has(climber2) && row < 17 && $.contains(document.getElementById('cell_container'), $(cells[col][row + 1])[0])) {
-
-                                        var y_pos = cell.position().top + unit / 1.3333 + unit / 2 + 1;
-
-                                        if (!$.contains(document.getElementById('cell_container'), $(cells[col][row - 1])[0])) {
-                                            y_pos = cell.position().top + unit / 1.3333 - unit / 2 + 1;
+                                if (!world.has(climber1) && row > 0 && ($.contains(document.getElementById('cell_container'), $(cells[col][row - 1])[0]) || !$.contains(document.getElementById('cell_container'), $(cells[col][row + 1])[0]))) {
+                                    climber1 = Physics.body('climber', {
+                                        x: cell.position().left + unit / 2
+                                        , y: cell.position().top + unit / 4 + unit / 2 - 1
+                                        , vy: -0.5 / 12
+                                        , height: unit / 2
+                                        , width: unit - 1
+                                        , restitution: 1
+                                        , cof: 0
+                                        , cell: [col, row]
+                                        , treatment: 'dynamic'
+                                        , mass: 100000
+                                        , dir: 'N'
+                                        , styles: {
+                                            fillStyle: 'red',
+                                            strokeStyle: 'red'
                                         }
+                                    });
 
-                                        climber2 = Physics.body('climber', {
-                                            x: cell.position().left + unit / 2
-                                            , y: y_pos
-                                            , vy: .5 / 12
-                                            , height: unit / 2
-                                            , width: unit - 1
-                                            , restitution: 1
-                                            , cof: 0
-                                            , cell: [col, row + ($.contains(document.getElementById('cell_container'), $(cells[col][row - 1])[0]) ? 1 : 0)]
-                                            , treatment: 'dynamic'
-                                            , mass: 100000
-                                            , dir: 'S'
-                                            , styles: {
-                                                fillStyle: 'blue',
-                                                strokeStyle: 'blue'
-                                            }
-                                        });
+                                    var climber_phy = Physics.behavior('climber-behavior')
+                                        .applyTo([climber1]);
+                                    world.addBody(climber1);
+                                    world.add(climber_phy);
+                                }
 
-                                        var climber_phy = Physics.behavior('climber-behavior')
-                                            .applyTo([climber2]);
-                                        world.addBody(climber2);
-                                        world.add(climber_phy);
+                                if (!world.has(climber2) && row < 17 && $.contains(document.getElementById('cell_container'), $(cells[col][row + 1])[0])) {
+
+                                    var y_pos = cell.position().top + unit / 1.3333 + unit / 2 + 1;
+
+                                    if (!$.contains(document.getElementById('cell_container'), $(cells[col][row - 1])[0])) {
+                                        y_pos = cell.position().top + unit / 1.3333 - unit / 2 + 1;
                                     }
+
+                                    climber2 = Physics.body('climber', {
+                                        x: cell.position().left + unit / 2
+                                        , y: y_pos
+                                        , vy: .5 / 12
+                                        , height: unit / 2
+                                        , width: unit - 1
+                                        , restitution: 1
+                                        , cof: 0
+                                        , cell: [col, row + ($.contains(document.getElementById('cell_container'), $(cells[col][row - 1])[0]) ? 1 : 0)]
+                                        , treatment: 'dynamic'
+                                        , mass: 100000
+                                        , dir: 'S'
+                                        , styles: {
+                                            fillStyle: 'blue',
+                                            strokeStyle: 'blue'
+                                        }
+                                    });
+
+                                    var climber_phy = Physics.behavior('climber-behavior')
+                                        .applyTo([climber2]);
+                                    world.addBody(climber2);
+                                    world.add(climber_phy);
+                                }
                             }
                             else {
+
+                                if (!world.has(climber1) && col > 0 && ($.contains(document.getElementById('cell_container'), $(cells[col - 1][row])[0]) || !$.contains(document.getElementById('cell_container'), $(cells[col + 1][row])[0]))) {
+
+                                    climber1 = Physics.body('climber', {
+                                        x: cell.position().left - unit / 4 - 1
+                                        , y: cell.position().top + unit / 2
+                                        , vx: -0.5 / 12
+                                        , height: unit - 1
+                                        , width: unit / 2
+                                        , restitution: 1
+                                        , cof: 0
+                                        , cell: [col - 1, row] // + ($.contains(document.getElementById('cell_container'), $(cells[col][row - 1])[0]) ? 1 : 0)]
+                                        , treatment: 'dynamic'
+                                        , mass: 100000
+                                        , dir: 'W'
+                                        , styles: {
+                                            fillStyle: 'yellow',
+                                            strokeStyle: 'yellow'
+                                        }
+                                    });
+
+                                    var climber_phy = Physics.behavior('climber-behavior')
+                                        .applyTo([climber1]);
+                                    world.addBody(climber1);
+                                    world.add(climber_phy);
+                                }
 
                                 if (!world.has(climber2) && col < 26 && $.contains(document.getElementById('cell_container'), $(cells[col + 1][row])[0])) {
 
@@ -295,7 +327,6 @@
 
                 })
             }
-
         );
     </script>
 
