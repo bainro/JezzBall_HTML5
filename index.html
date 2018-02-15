@@ -126,8 +126,8 @@
                                 x: Math.random() * canvasWidth
                                 , y: Math.random() * canvasHeight
                                 , radius: unit / 2 - .5
-                                , vx: random_velocity
-                                , vy: (0.0625 - random_velocity ** 2) ** 0.5 * plus_or_minus
+                                , vx: canvasWidth / 1600// random_velocity
+                                //, vy: (0.0625 - random_velocity ** 2) ** 0.5 * plus_or_minus
                                 , angularVelocity: Math.random() * .02 - .01
                                 , mass: 0.001
                                 , restitution: 1

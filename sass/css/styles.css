@@ -120,7 +120,7 @@ body.win-game:after {
   position: absolute;
   z-index: 1;
   border: 1px solid black;
-  border-radius: 4px; }
+  border-radius: 3px; }
 
 #cell_container {
   position: absolute;
@@ -128,5 +128,13 @@ body.win-game:after {
   background-size: contain;
   background-position: center;
   background-color: black; }
+
+@media screen and (min-width: 700px) {
+  .cell {
+    background: gray;
+    position: absolute;
+    z-index: 1;
+    border: 1px solid black;
+    border-radius: 4px; } }
 
 /*# sourceMappingURL=styles.css.map */
