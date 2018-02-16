@@ -39,11 +39,20 @@ define(
 
             if ($('#cell_container').children().length <= 121) {
 
-                if (lvl >= 10) {
-                    console.log('YOU WON');
+                if (lvl >= 5) {
+                    //then you win and restart
+                    setTimeout( () => {
+                        $('#between_lvl_screen').css({ display: 'block', background: 'rgba(255, 255, 255, 0.84)' }).html('YOU BEAT THE GAME!');
+                        $('#between_lvl_screen').center();
+                        $(document).on('click', function () {
+                            world.destroy();
+                            $('#between_lvl_screen').css('display', 'hidden');
+                            new_game();
+                        });
+                    }, 250);
                 }
                 else {
-                    $('#between_lvl_screen').css('zIndex', '2').html('Lvl ' + lvl + ' completed! Tap to continue');
+                    $('#between_lvl_screen').css({ display: 'block', background: 'rgba(255, 255, 255, 0.84)'}).html('Lvl ' + lvl + ' completed! Tap to continue');
                     $('#between_lvl_screen').center();
                     self_destruct = true;
 
@@ -52,7 +61,7 @@ define(
 
                         $(document).on('click touchend', (e) => {
 
-                            $('#between_lvl_screen').css('zIndex', '-1');
+                            $('#between_lvl_screen').css('display', 'none');
                             self_destruct = false;
 
                             var balls = world.find(Physics.query({
@@ -79,8 +88,8 @@ define(
 
                             $('#cell_container').css(
                                 {
-                                    background: 'url("./images/staredad.jpg") no-repeat',
-                                    backgroundSize: "contain",
+                                    background: 'url("./images/' + lvl + '.jpg") no-repeat',
+                                    backgroundSize: "cover",
                                     backgroundPosition: "center",
                                     backgroundColor: "black"
                                 });
@@ -194,12 +203,11 @@ define(
                 //Called by integrator to update positions
                 behave: function () {
 
-                    var world = this._world,
-                        row,
-                        col;
+                    var world = this._world;
 
                     if (self_destruct) {
                         world.removeBehavior(this);
+                        return;
                     }
 
                     this.getTargets()[0].grow();
@@ -211,9 +219,11 @@ define(
                     ) {
                         this.getTargets()[0].die();
 
-                        var balls = world.find(Physics.query({
-                            name: 'circle'
-                        }));
+                        var col, 
+                            row,
+                            balls = world.find(Physics.query({
+                                name: 'circle'
+                            }));
 
                         for (var i = 0; i < balls.length; i++) {
                             //get coord's and convert to matrix indexes

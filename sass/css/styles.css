@@ -29,7 +29,7 @@ li {
   box-sizing: border-box; }
 
 html {
-  background: #ffd4ff;
+  background: url(http://subtlepatterns2015.subtlepatterns.netdna-cdn.com/patterns/squares.png) repeat;
   padding: 0;
   margin: 0;
   width: 100%;
@@ -44,38 +44,13 @@ body {
   height: 100%;
   overflow: hidden; }
 
-body:after {
-  font-size: 25px;
-  line-height: 140px;
-  text-align: center;
-  color: #3c100b;
-  background: rgba(255, 255, 255, 0.6);
-  position: absolute;
-  padding: 0 1em;
-  border-radius: 5px;
-  z-index: 2;
-  top: 0;
-  left: 0; }
-
-body.before_game:after {
-  content: 'Tap the screen to start'; }
-
-body.lose-game:after {
-  content: 'Game Over. Tap to try again'; }
-
-body.beat-level:after {
-  content: 'Level completed! Tap to start next level'; }
-
-body.win-game:after {
-  content: 'You beat the game?! Congratulations!'; }
-
 #between_lvl_screen {
   color: #3c100b;
-  background: rgba(255, 255, 255, 0.84);
+  background: rgba(255, 255, 255, 0.6);
   z-index: 2;
   font-size: 25px;
   font-weight: 600;
-  line-height: 140px;
+  line-height: 100px;
   text-align: center;
   padding: 0 1em;
   border-radius: 15px; }
@@ -96,13 +71,17 @@ body.win-game:after {
   z-index: 2 !important; }
 
 #turn {
-  display: none; }
+  display: none;
+  background: radial-gradient(#8a0000 4%, #5c0000 9%, rgba(102, 0, 0, 0) 9%) 0 0, radial-gradient(#8a0000 4%, #5c0000 8%, rgba(102, 0, 0, 0) 10%) 50px 50px, radial-gradient(rgba(153, 0, 0, 0.8) 20%, rgba(102, 0, 0, 0)) 50px 0, radial-gradient(rgba(153, 0, 0, 0.8) 20%, rgba(102, 0, 0, 0)) 0 50px, radial-gradient(#660000 35%, rgba(102, 0, 0, 0) 60%) 50px 0, radial-gradient(#660000 35%, rgba(102, 0, 0, 0) 60%) 100px 50px, radial-gradient(rgba(77, 0, 0, 0.7), rgba(102, 0, 0, 0)) 0 0, radial-gradient(rgba(77, 0, 0, 0.7), rgba(102, 0, 0, 0)) 50px 50px, linear-gradient(45deg, rgba(102, 0, 0, 0) 49%, black 50%, rgba(102, 0, 0, 0) 70%) 0 0, linear-gradient(-45deg, rgba(102, 0, 0, 0) 49%, black 50%, rgba(102, 0, 0, 0) 70%) 0 0;
+  background-color: #300;
+  background-size: 100px 100px; }
   #turn #turn_inside {
-    max-width: 88%;
+    max-width: 100%;
     text-align: center;
-    padding: .5em;
-    background: rgba(255, 255, 255, 0.69);
-    border-radius: 15px; }
+    padding: 0 1em;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.6);
+    line-height: 100px; }
 
 @media (orientation: portrait) {
   #turn {
@@ -114,12 +93,10 @@ body.win-game:after {
     left: 0;
     height: 100%;
     width: 100%;
-    background: #473a3a;
     color: black;
     z-index: 10;
     font-weight: 600;
-    font-size: 2em;
-    border-radius: 40px; }
+    font-size: 1.5em; }
 
   #cell_container {
     max-width: 100%;
@@ -137,8 +114,7 @@ body.win-game:after {
   background: gray;
   position: absolute;
   z-index: 1;
-  border: 1px solid black;
-  border-radius: 3px; }
+  border: 1px dashed black; }
 
 #cell_container {
   position: absolute;
@@ -146,13 +122,5 @@ body.win-game:after {
   background-size: contain;
   background-position: center;
   background-color: black; }
-
-@media screen and (min-width: 700px) {
-  .cell {
-    background: gray;
-    position: absolute;
-    z-index: 1;
-    border: 1px solid black;
-    border-radius: 4px; } }
 
 /*# sourceMappingURL=styles.css.map */

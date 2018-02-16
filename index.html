@@ -68,17 +68,30 @@
                     jQuery.fn.center = function () {
                         this.css("position", "absolute");
                         if (window.innerWidth > window.innerHeight) {
-                        this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) +
-                            $(window).scrollTop()) + "px");
-                        this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) +
-                            $(window).scrollLeft()) + "px");
+                            this.css("top", Math.max(0, (($(window).height() - $(this).outerHeight()) / 2) +
+                                $(window).scrollTop()) + "px");
+                            this.css("left", Math.max(0, (($(window).width() - $(this).outerWidth()) / 2) +
+                                $(window).scrollLeft()) + "px");
                         }
                         else {
-                            setTimeout( function () {
+                            setTimeout(function () {
                                 $('#between_lvl_screen').center();
                             }, 200);
                         }
                         return this;
+                    }
+
+                    subscribe_ticker = function () {
+                        if (world) {
+                            Physics.util.ticker.on(function (time) {
+                                world.step(time);
+                            }).start();
+                        }
+                        else {
+                            setTimeout(() => {
+                                subscribe_ticker();
+                            }, 150);
+                        }
                     }
 
                     load_climber_handler = function () {
@@ -215,7 +228,7 @@
 
                     var init = function init(world, Physics) {
 
-                        $('#between_lvl_screen').css('zIndex', '-1');
+                        $('#between_lvl_screen').css('display', 'none');
 
                         var width = Math.max($('html').height(), window.innerWidth),
                             height = Math.min($('html').height(), window.innerWidth),
@@ -291,7 +304,7 @@
                                 , styles: {
                                     strokeStyle: '#f4356f'
                                     , fillStyle: 'black'
-                                    , angleIndicator: '#ff00ff'
+                                    , angleIndicator: 'green'
                                 }
                             });
                             ball.gameType = 'circle';
@@ -303,8 +316,8 @@
 
                         world.add([
                             Physics.behavior('body-impulse-response')
-                            , Physics.behavior('body-collision-detection')
                             , Physics.behavior('sweep-prune')
+                            , Physics.behavior('body-collision-detection')
                         ]);
 
                         world.on('step', function () {
@@ -328,18 +341,16 @@
                         }, 500);
                     }
 
-                    var inGame = false;
-
                     //Event listener to start new game
                     $(document).on('click touchend', (e) => {
                         if (window.innerWidth > window.innerHeight) {
-                            newGame();
+                            new_game();
                             $(document).off('click touchend');
                         }
                     });
 
                     var world = null;
-                    var newGame = function newGame() {
+                    new_game = function new_game() {
 
                         if (world) {
                             world.destroy();
@@ -350,11 +361,7 @@
                     };
 
                     // subscribe to ticker and start looping
-                    Physics.util.ticker.on(function (time) {
-                        if (world) {
-                            world.step(time);
-                        }
-                    }).start();
+                    subscribe_ticker();
 
                 })
             }
