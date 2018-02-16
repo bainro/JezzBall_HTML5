@@ -48,6 +48,8 @@ define(
                     self_destruct = true;
 
                     setTimeout(function () {
+                        $('#viewport').off('click');
+
                         $(document).on('click touchend', (e) => {
 
                             $('#between_lvl_screen').css('zIndex', '-1');
@@ -109,12 +111,14 @@ define(
                             }
 
                             world.add(balls);
-
                             $(document).off('click touchend');
+                            setTimeout( function () {
+                                load_climber_handler();
+                            }, 150);
                         });
                     }, 250);
                 }
-
+                up_down_dir = true;
                 lvl++;
                 cells_left = 486;
             }
