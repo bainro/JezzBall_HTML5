@@ -225,6 +225,7 @@
                     }
 
                     $('#between_lvl_screen').center();
+                    var world = null;
 
                     var init = function init(world, Physics) {
 
@@ -286,8 +287,14 @@
                             cells.push(col);
                         }
 
-                        var i = 2;
-                        var balls = [];
+                        var i = 2,
+                            balls = [],
+                            view = new Image();
+                        
+                        view.width = unit - 1;
+                        view.height = unit - 1;
+                        view.src = ('./images/jezzball_ball.png');
+
                         while (i--) {
                             var plus_or_minus = Math.random() < 0.5 ? -1 : 1;
                             var random_velocity = Math.random() * .25 - .125;
@@ -307,6 +314,7 @@
                                     , angleIndicator: 'green'
                                 }
                             });
+                            ball.view = view;
                             ball.gameType = 'circle';
                             balls.push(ball);
                         }
@@ -349,7 +357,6 @@
                         }
                     });
 
-                    var world = null;
                     new_game = function new_game() {
 
                         if (world) {

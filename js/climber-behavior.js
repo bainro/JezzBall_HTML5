@@ -23,7 +23,7 @@ define(
             return;
         }
 
-        function remove_unmarked(world) {
+        function remove_unmarked() {
             for (var i = 0; i < 27; i++) {
                 for (var j = 0; j < 18; j++) {
                     if ($(cells[i][j]).data('marked') === false) {
@@ -41,11 +41,12 @@ define(
 
                 if (lvl >= 5) {
                     //then you win and restart
+                    $('#between_lvl_screen').css({ display: 'block', background: 'rgba(255, 255, 255, 0.84)' }).html('YOU BEAT THE GAME!');
+                    $('#between_lvl_screen').center();
                     setTimeout( () => {
-                        $('#between_lvl_screen').css({ display: 'block', background: 'rgba(255, 255, 255, 0.84)' }).html('YOU BEAT THE GAME!');
-                        $('#between_lvl_screen').center();
                         $(document).on('click', function () {
                             world.destroy();
+                            $('.pjs-meta').remove();
                             $('#between_lvl_screen').css('display', 'hidden');
                             new_game();
                         });
@@ -94,8 +95,14 @@ define(
                                     backgroundColor: "black"
                                 });
 
-                            var i = lvl + 1;
-                            var balls = [];
+                            var i = lvl + 1,
+                                balls = [],
+                                view = new Image();
+
+                            view.width = unit - 1;
+                            view.height = unit - 1;
+                            view.src = ('./images/jezzball_ball.png');
+
                             while (i--) {
                                 var plus_or_minus = Math.random() < 0.5 ? -1 : 1;
                                 var random_velocity = Math.random() * .25 - .125;
@@ -115,6 +122,7 @@ define(
                                         , angleIndicator: '#ff00ff'
                                     }
                                 });
+                                ball.view = view;
                                 ball.gameType = 'circle';
                                 balls.push(ball);
                             }
@@ -153,10 +161,10 @@ define(
 
                 checkClimberCollision: function (data) {
 
-                    var world = this._world
-                        , collisions = data.collisions
+                    var collisions = data.collisions
                         , col
                         ;
+                    world = this._world;
 
                     for (var i = 0, l = collisions.length; i < l; ++i) {
                         col = collisions[i];
@@ -194,7 +202,7 @@ define(
                                 flood_mark([col, row]);
                             }
 
-                            remove_unmarked(world);
+                            remove_unmarked();//world);
                             world.removeBehavior(this);
                         }
                     }
@@ -210,6 +218,7 @@ define(
                         return;
                     }
 
+                    //COULD MAKE THIS A FX? ALSO APPEARS IN COLLISION CHECKER ABOVE
                     this.getTargets()[0].grow();
                     //if the climber reaches the viewport border
                     if (this.getTargets()[0].aabb().y - this.getTargets()[0].geometry.height / 2 < 0 ||
@@ -233,7 +242,7 @@ define(
                             flood_mark([col, row]);
                         }
 
-                        remove_unmarked(world);
+                        remove_unmarked();//world);
                         world.removeBehavior(this);
 
                     }
