@@ -61,6 +61,7 @@ define(
                             var num_of_cells = this.geometry.height / unit;
                             for (var i = 0; i <= num_of_cells; i++) {
                                 $(cells[this.source_cell[0]][this.source_cell[1] - i]).data('marked', false).detach();
+                                dead_climber_cells.push(this.source_cell[0] + '_' + (this.source_cell[1] - i));
                             }
                             var dead_copy = Physics.body('rectangle', {
                                 x: this.aabb().x
@@ -79,6 +80,7 @@ define(
                             var num_of_cells = this.geometry.height / unit;
                             for (var i = 0; i <= num_of_cells; i++) {
                                 $(cells[this.source_cell[0]][this.source_cell[1] + i]).data('marked', false).detach();
+                                dead_climber_cells.push(this.source_cell[0] + '_' + (this.source_cell[1] + i));
                             }
                             var dead_copy = Physics.body('rectangle', {
                                 x: this.aabb().x
@@ -97,6 +99,7 @@ define(
                             var num_of_cells = Math.ceil(this.geometry.width / unit);
                             for (var i = 0; i < num_of_cells; i++) {
                                 $(cells[this.source_cell[0] + i][this.source_cell[1]]).data('marked', false).detach();
+                                dead_climber_cells.push((this.source_cell[0] + i) + '_' + this.source_cell[1]);
                             }
                             var dead_copy = Physics.body('rectangle', {
                                 x: this.aabb().x + unit / 4 + 1
@@ -115,6 +118,7 @@ define(
                             var num_of_cells = Math.ceil(this.geometry.width / unit);
                             for (var i = 0; i < num_of_cells; i++) {
                                 $(cells[this.source_cell[0] - i][this.source_cell[1]]).data('marked', false).detach();
+                                dead_climber_cells.push((this.source_cell[0] - i) + '_' + this.source_cell[1]);
                             }
                             var dead_copy = Physics.body('rectangle', {
                                 x: this.aabb().x - unit / 4 + 1

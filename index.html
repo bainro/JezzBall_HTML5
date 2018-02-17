@@ -64,7 +64,7 @@
         ],
             function (Physics) {
                 Physics(function (world) {
-
+                    
                     jQuery.fn.center = function () {
                         this.css("position", "absolute");
                         if (window.innerWidth > window.innerHeight) {
@@ -273,6 +273,23 @@
 
                         $('#cell_container').css('top', $('#viewport').position().top).css('left', $('#viewport').position().left).height(18 * unit).width(27 * unit);
 
+                        dead_climber_cells = [];
+
+                        if (window.Worker) {
+                            var myWorker = new Worker("./js/worker.js");
+
+                            $(document).on('request_flood_mark', (e, col, row) => {
+                                myWorker.postMessage([dead_climber_cells, col, row]);
+                                console.log('Message sent to worker');
+                            });
+
+                            myWorker.onmessage = function (e) {
+                                var data = e.data;
+                                $(document).trigger('response_flood_mark', JSON.stringify(e.data));
+                                //console.log('Message received from worker', e.data);
+                            };
+                        }
+
                         //add the 27*18 (486) matrix using a DOM element for each cell
 
                         cells = [];
@@ -280,7 +297,7 @@
                         for (i = 0; i < 27; i++) {
                             var col = [];
                             for (j = 0; j < 18; j++) {
-                                var cell = $('<span>').addClass('cell').height(unit).width(unit).css('top', j * unit).css('left', i * unit).data('marked', false);
+                                var cell = $('<span>').addClass('cell').attr('id', i + '_' + j).height(unit).width(unit).css('top', j * unit).css('left', i * unit).data('marked', false);
                                 $('#cell_container').append(cell);
                                 col.push(cell);
                             }

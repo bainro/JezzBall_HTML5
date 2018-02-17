@@ -123,4 +123,10 @@ body {
   background-position: center;
   background-color: black; }
 
+/*@include mQ (700px) {
+    .cell{
+        
+    }
+}*/
+
 /*# sourceMappingURL=styles.css.map */
