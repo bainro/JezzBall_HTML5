@@ -8,19 +8,65 @@ define(
 
         //If the referenced cell is real, not marked as true, and still attached to the DOM
         function flood_mark(indexes) {
-            if (indexes[0] >= 0 && indexes[0] <= 26 && indexes[1] >= 0 && indexes[1] <= 17
-                && $(cells[indexes[0]][indexes[1]]).data('marked') === false
-                && $.contains(document.getElementById('cell_container'), $(cells[indexes[0]][indexes[1]])[0])
-            ) {
-                $(cells[indexes[0]][indexes[1]]).data('marked', true);
+            /*if (
+                indexes[0] >= 0 && indexes[0] < 27 && indexes[1] >= 0 && indexes[1] < 18 &&
+                $(cells[indexes[0]][indexes[1]]).data('marked') === false &&
+                $.contains(document.getElementById('cell_container'), $(cells[indexes[0]][indexes[1]])[0])
+            ) {*/
+                //$(cells[indexes[0]][indexes[1]]).data('marked', true);
+
+                var queue = [];
+                queue.push(indexes);
+                for (var i = 0; i < queue.length; i++) {
+                    var w = [];
+                    w[0] = queue[i][0];
+                    w[1] = queue[i][1];
+                    var e = [];
+                    e[0] = queue[i][0];
+                    e[1] = queue[i][1];
+
+                        //need to check that target cell is still within DOM
+                    while (w[0] - 1 >= 0 && $(cells[w[0] - 1][w[1]]).data('marked') === false && $.contains(document.getElementById('cell_container'), $(cells[w[0] - 1][w[1]])[0])) {
+                        w[0] = w[0] - 1;
+                    }
+                    while (e[0] + 1 < 27 && $(cells[e[0] + 1][e[1]]).data('marked') === false && $.contains(document.getElementById('cell_container'), $(cells[e[0] + 1][e[1]])[0])) {
+                        e[0] = e[0] + 1;
+                    }
+                    //calc nodes between e and w
+                    for (var j = w[0]; j <= e[0]; j++) {
+                        //console.log('marked one as true');
+                        $(cells[j][w[1]]).data('marked', true);
+                        if ($(cells[j][w[1] - 1]).data('marked') === false && (w[1] - 1) >= 0 && $.contains(document.getElementById('cell_container'), $(cells[j][w[1] - 1])[0])) {
+                            queue.push([j, w[1] - 1]);
+                        }
+                        if ($(cells[j][w[1] + 1]).data('marked') === false && (w[1] + 1) < 18 && $.contains(document.getElementById('cell_container'), $(cells[j][w[1] + 1])[0])) {
+                            queue.push([j, w[1] + 1]);
+                        }
+                    }
+                }
+
+                return;
+                /*
+ 5. For each node N in Q:
+ 6.         Set w and e equal to N.
+ 7.         Move w to the west until the color of the node to the west of w no longer matches target-color.
+ 8.         Move e to the east until the color of the node to the east of e no longer matches target-color.
+ 9.         For each node n between w and e:
+10.             Set the color of n to replacement-color.
+11.             If the color of the node to the north of n is target-color, add that node to Q.
+12.             If the color of the node to the south of n is target-color, add that node to Q.
+13. Continue looping until Q is exhausted.
+14. Return.
+                */
+
 
                 //recursive calls passing each adjacent cell
-                flood_mark([indexes[0] + 1, indexes[1]]);
-                flood_mark([indexes[0] - 1, indexes[1]]);
-                flood_mark([indexes[0], indexes[1] - 1]);
-                flood_mark([indexes[0], indexes[1] + 1]);
-            }
-            return;
+                //flood_mark([indexes[0] + 1, indexes[1]]);
+                //flood_mark([indexes[0] - 1, indexes[1]]);
+                //flood_mark([indexes[0], indexes[1] - 1]);
+                //flood_mark([indexes[0], indexes[1] + 1]);
+           // }
+           // return;
         }
 
         function remove_unmarked() {
