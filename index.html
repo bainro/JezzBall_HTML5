@@ -23,7 +23,7 @@
 <body oncontextmenu="return false;">
 
     <div id="canvas_flex">
-        <canvas id="viewport" width="500" height="500"></canvas>
+        <canvas id="viewport" width="500" height="500" style="z-index:10 !important;"></canvas>
     </div>
 
     <div id="turn">
@@ -34,12 +34,27 @@
     </div>
 
     <div id="cell_container">
-        <!-- 2D Matrix of "cell" elements creating the background grid -->
+        <!--2D Matrix of "cell" elements creating the background grid-->
     </div>
 
     <div id='between_lvl_screen'>
         Tap the screen to start
     </div>
+
+    <span id="current_dir_container">
+        <span id="current_dir">&#8597;</span>
+    </span>
+
+    <span id="lives_container">
+        <span>Lives: </span>
+        <span id="lives">3</span>
+    </span>
+
+    <span id="percent">
+        00%
+    </span>
+
+    <span id="timer">120</span>
 
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" crossorigin="anonymous"></script>
     <script src="./js/jquery-mobile.js"></script>
@@ -64,7 +79,7 @@
         ],
             function (Physics) {
                 Physics(function (world) {
-                    
+
                     jQuery.fn.center = function () {
                         this.css("position", "absolute");
                         if (window.innerWidth > window.innerHeight) {
@@ -102,13 +117,13 @@
                                 row = Math.round(((e.clientY - $('#viewport').position().top) - unit * .5) / unit),
                                 cell = cells[col][row];
 
-                            if (this.up_down_dir === true) {
+                            if (this.dir_toggle === true) {
 
                                 if (!world.has(this.climber1) && row > 0 && ($.contains(document.getElementById('cell_container'), $(cells[col][row - 1])[0]) || !$.contains(document.getElementById('cell_container'), $(cells[col][row + 1])[0]))) {
                                     this.climber1 = Physics.body('climber', {
                                         x: cell.position().left + unit / 2
                                         , y: cell.position().top + unit / 4 + unit / 2 - 1
-                                        , vy: -0.5 / 12
+                                        , vy: -2 * unit ** 1.5 / 4790
                                         , height: unit / 2
                                         , width: unit - 1
                                         , restitution: 1
@@ -140,7 +155,7 @@
                                     this.climber2 = Physics.body('climber', {
                                         x: cell.position().left + unit / 2
                                         , y: y_pos
-                                        , vy: .5 / 12
+                                        , vy: 2 * unit ** 1.5 / 4790
                                         , height: unit / 2
                                         , width: unit - 1
                                         , restitution: 1
@@ -168,7 +183,7 @@
                                     this.climber1 = Physics.body('climber', {
                                         x: cell.position().left - unit / 4 - 1
                                         , y: cell.position().top + unit / 2
-                                        , vx: -0.5 / 12
+                                        , vx: -2 * unit ** 1.5 / 4790
                                         , height: unit - 1
                                         , width: unit / 2
                                         , restitution: 1
@@ -200,7 +215,7 @@
                                     this.climber2 = Physics.body('climber', {
                                         x: x_pos
                                         , y: cell.position().top + unit / 2
-                                        , vx: .5 / 12
+                                        , vx: 2 * unit ** 1.5 / 4790
                                         , height: unit - 1
                                         , width: unit / 2
                                         , restitution: 1
@@ -231,19 +246,54 @@
 
                         $('#between_lvl_screen').css('display', 'none');
 
+                        $('#percent').html('00%');
+                        lives = 3;
+                        $('#lives').html(lives);
+                        time_left = 120;
+                        $('#timer').css('color', 'black');
+                        timer_id = setInterval(() => {
+                            if (time_left-- > 0) {
+                                $('#timer').html(String(time_left).padStart(3, '0'));
+                                if (time_left == 30) {
+                                    $('#timer').css('color', '#ff1f1f');
+                                }
+                            }
+                            else {
+                                $('#between_lvl_screen').css({ display: 'block', background: 'rgba(255, 255, 255, 0.84)' }).html('Game Over! Tap to restart');
+                                $('#between_lvl_screen').center();
+                                clearInterval(timer_id);
+                                world.remove(world.find(Physics.query({
+                                    name: 'climber'
+                                })));
+                                self_destruct = true;
+                                setTimeout(() => {
+                                    $(document).on('click', function () {
+                                       self_destruct = false;
+                                        $('#viewport').off('click');
+                                        $('html').off('swipe mouseup');
+                                        $('#cell_container').empty();
+                                        //$('.pjs-meta').remove();
+                                        $('#between_lvl_screen').css('display', 'hidden');
+                                        $(document).off('click');
+                                        new_game();
+                                    });
+                                }, 250);
+                            }
+                        }, 1000);
+
                         var width = Math.max($('html').height(), window.innerWidth),
                             height = Math.min($('html').height(), window.innerWidth),
                             climber1,
                             climber2;
                         lvl = 1;
-                        up_down_dir = true;
+                        dir_toggle = true;
                         self_destruct = false;
 
                         if (width / height <= 1.5) {
                             //scale canvas to the width
                             unit = width / 27;
-                            canvasWidth = width,
-                                canvasHeight = unit * 18;
+                            canvasWidth = width;
+                            canvasHeight = unit * 18;
                         }
                         else {
                             //scale canvas to the height
@@ -251,6 +301,29 @@
                                 canvasWidth = unit * 27,
                                 canvasHeight = height;
                         }
+
+                        document.body.style.cursor = 'n-resize';
+                        $('#current_dir_container').css({
+                            display: 'flex',
+                            height: 1.5 * unit + "px",
+                            width: 1.5 * unit + "px",
+                            fontSize: 1.125 * unit + 'px',
+                        });
+
+                        $('#timer').css({
+                            display: 'inline',
+                            fontSize: 1.25 * unit + 'px',
+                        });
+
+                        $('#lives_container').css({
+                            display: 'inline',
+                            fontSize: 1.125 * unit + 'px',
+                        });
+
+                        $('#percent').css({
+                            display: 'inline',
+                            fontSize: 1.125 * unit + 'px',
+                        });
 
                         var viewportBounds = Physics.aabb(0, 0, canvasWidth, canvasHeight);
 
@@ -267,28 +340,11 @@
                             autoResize: false,
                             width: canvasWidth,
                             height: canvasHeight,
-                            meta: true
+                            //meta: true
                         });
                         world.add(renderer);
 
                         $('#cell_container').css('top', $('#viewport').position().top).css('left', $('#viewport').position().left).height(18 * unit).width(27 * unit);
-
-                        dead_climber_cells = [];
-
-                        if (window.Worker) {
-                            var myWorker = new Worker("./js/worker.js");
-
-                            $(document).on('request_flood_mark', (e, col, row) => {
-                                myWorker.postMessage([dead_climber_cells, col, row]);
-                                console.log('Message sent to worker');
-                            });
-
-                            myWorker.onmessage = function (e) {
-                                var data = e.data;
-                                $(document).trigger('response_flood_mark', JSON.stringify(e.data));
-                                //console.log('Message received from worker', e.data);
-                            };
-                        }
 
                         //add the 27*18 (486) matrix using a DOM element for each cell
 
@@ -297,7 +353,7 @@
                         for (i = 0; i < 27; i++) {
                             var col = [];
                             for (j = 0; j < 18; j++) {
-                                var cell = $('<span>').addClass('cell').attr('id', i + '_' + j).height(unit).width(unit).css('top', j * unit).css('left', i * unit).data('marked', false);
+                                var cell = $('<span>').addClass('cell').height(unit).width(unit).css('top', j * unit).css('left', i * unit).data('marked', false);
                                 $('#cell_container').append(cell);
                                 col.push(cell);
                             }
@@ -305,32 +361,34 @@
                         }
 
                         var i = 2,
-                            balls = [],
                             view = new Image();
-                        
+
+                        balls = [];
+
                         view.width = unit - 1;
                         view.height = unit - 1;
                         view.src = ('./images/jezzball_ball.png');
 
                         while (i--) {
-                            var plus_or_minus = Math.random() < 0.5 ? -1 : 1;
-                            var random_velocity = Math.random() * .25 - .125;
-                            var ball = Physics.body('circle', {
-                                x: Math.random() * canvasWidth
-                                , y: Math.random() * canvasHeight
-                                , radius: unit / 2 - .5
-                                , vx: random_velocity
-                                , vy: (0.0625 - random_velocity ** 2) ** 0.5 * plus_or_minus
-                                , angularVelocity: Math.random() * .02 - .01
-                                , mass: 0.001
-                                , restitution: 1
-                                , cof: 0
-                                , styles: {
-                                    strokeStyle: '#f4356f'
-                                    , fillStyle: 'black'
-                                    , angleIndicator: 'green'
-                                }
-                            });
+                            var plus_or_minus = Math.random() < 0.5 ? -1 : 1,
+                                max_v = unit ** 1.5 / 400,
+                                random_v = Math.random() * max_v - 0.5 * max_v,
+                                ball = Physics.body('circle', {
+                                    x: Math.random() * canvasWidth
+                                    , y: Math.random() * canvasHeight
+                                    , radius: unit / 2 - .5
+                                    , vx: random_v
+                                    , vy: (max_v ** 2 - random_v ** 2) ** 0.5 * plus_or_minus
+                                    , angularVelocity: Math.random() * .02 - .01
+                                    , mass: 0.001
+                                    , restitution: 1
+                                    , cof: 0
+                                    , styles: {
+                                        strokeStyle: '#f4356f'
+                                        , fillStyle: 'black'
+                                        , angleIndicator: 'green'
+                                    }
+                                });
                             ball.view = view;
                             ball.gameType = 'circle';
                             balls.push(ball);
@@ -345,25 +403,41 @@
                             , Physics.behavior('body-collision-detection')
                         ]);
 
+                        counter = 0;
+
                         world.on('step', function () {
                             world.render();
                         });
 
-                        //switch up_down_dir of climbers
+                        //switch dir_toggle of climbers
                         $('html').on('mouseup', function (e) {
                             if (e.which == 3) {
-                                up_down_dir = !up_down_dir;
+                                dir_toggle = !dir_toggle;
+                                if (dir_toggle === false) {
+                                    $('#current_dir').html('&harr;');
+                                    document.body.style.cursor = 'w-resize';
+                                }
+                                else {
+                                    $('#current_dir').html('&#8597;');
+                                    document.body.style.cursor = 'n-resize';
+                                }
                             }
                         });
 
                         $('html').on('swipe', function () {
-                            up_down_dir = !up_down_dir;
+                            dir_toggle = !dir_toggle;
+                            if (dir_toggle === false) {
+                                $('#current_dir').html('&harr;');
+                            }
+                            else {
+                                $('#current_dir').html('&#8597;');
+                            }
                         });
 
                         //load event listeners 1/2 sec after game begins
                         setTimeout(function () {
                             load_climber_handler();
-                        }, 500);
+                        }, 400);
                     }
 
                     //Event listener to start new game
@@ -378,6 +452,12 @@
 
                         if (world) {
                             world.destroy();
+                            $('#cell_container').css({
+                                background: "url('./images/dream.jpg')",
+                                backgroundRepeat: "no-repeat",
+                                backgroundSize: 'contain',
+                                backgroundPosition: 'center'
+                            });
                         }
 
                         world = Physics(init);

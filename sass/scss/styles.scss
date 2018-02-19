@@ -11,6 +11,7 @@ html{
     width: 100%;
     height: 100%;
     overflow: hidden;
+    z-index: -10;
 }
 
 body {
@@ -20,12 +21,14 @@ body {
     width:      100%;
     height:     100%;
     overflow:   hidden;
+    z-index:    -7;
+    font-family: calibri;
 }
 
 #between_lvl_screen{
     color:        #3c100b;
     background:   rgba(255, 255, 255, 0.6);
-    z-index:        2;
+    z-index:        11;
     font-size:      25px;
     font-weight:    600;
     line-height:    100px;
@@ -49,7 +52,7 @@ body {
 #viewport{
     position: static !important;
     //background: black;
-    z-index: 2 !important;
+    z-index: 10 !important;
 }
 
 #turn{
@@ -99,6 +102,9 @@ body {
         left:       0 !important;
         top:        0 !important;
     }
+    #between_lvl_screen{
+        display: none !important;
+    }
 }
 
 #canvas_flex{
@@ -106,14 +112,14 @@ body {
     justify-content:    center;
     align-items:        center;
     height:             100%;
+    z-index:            9;
 }
 
 .cell{
     background:   gray;
     position:       absolute;
-    z-index:        1;
-    border:         1px dashed black;
-    //border-radius:  3px; 
+    z-index:        -2;
+    border:    1px dashed black;
 }
 
 #cell_container{
@@ -122,10 +128,69 @@ body {
     background-size:    contain;
     background-position:center;
     background-color:   black;
+    z-index:            -2;
 }
 
-/*@include mQ (700px) {
-    .cell{
-        
+#current_dir_container{
+    display:        none;
+    border-radius:  10px;
+    background:   rgba(255, 255, 255, 0.6);
+    top:            5px;
+    left:           5px;
+    text-align:     center;
+    position:       absolute;
+    justify-content: center;
+    padding: .1em;
+    span {
+        max-width: 100%;
+        max-height: 100%;
     }
-}*/
+}
+
+#timer{
+    display: none;
+    position: absolute;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.6);
+    text-shadow: 1px -1px 0 #fff, 1px 1px 1px #000;
+    padding: .1em;
+    top:    5px;
+    right:  5px;
+}
+
+#lives_container{
+    display: none;
+    position: absolute;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.6);
+    color: black;
+    //text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    text-shadow: 1px -1px 0 #fff, 1px 1px 1px #000;
+    bottom:    5px;
+    left:  5px;
+    padding: .17em;
+}
+
+#percent{
+    display: none;
+    position: absolute;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.6);
+    color: black;
+    //text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    text-shadow: 1px -1px 0 #fff, 1px 1px 1px #000;
+    bottom:    5px;
+    right:  5px;
+    padding: .1em;
+}
+
+#dir_img{
+    max-width: 100%;
+    max-height: 100%;
+}
+
+@include mQ (850px) {
+    #timer, #lives_container{
+        padding: 0;
+    }
+}

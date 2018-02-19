@@ -14,7 +14,7 @@ define(
                 init: function (options) {
                     parent.init.call(this, options);
                     this.dir = options.dir;
-                    this.growth = .5;
+                    this.growth = unit ** 1.5 / 200;
                     this.gameType = "climber";
                     this.source_cell = options.cell;
                     view = new Image();
@@ -38,18 +38,16 @@ define(
                 },
 
                 grow: function () {
-
                     if (this.dir == 'N' || this.dir == 'S') {
                         this.geometry.height += this.growth;
                         $(this.view).attr('height', this.geometry.height);
+                        return;
                     }
-
-                    if (this.dir == 'E' || this.dir == 'W') {
+                    else {
                         this.geometry.width += this.growth;
                         $(this.view).attr('width', this.geometry.width);
+                        return;
                     }
-
-                    return this;
                 },
 
                 die: function () {
@@ -61,7 +59,6 @@ define(
                             var num_of_cells = this.geometry.height / unit;
                             for (var i = 0; i <= num_of_cells; i++) {
                                 $(cells[this.source_cell[0]][this.source_cell[1] - i]).data('marked', false).detach();
-                                dead_climber_cells.push(this.source_cell[0] + '_' + (this.source_cell[1] - i));
                             }
                             var dead_copy = Physics.body('rectangle', {
                                 x: this.aabb().x
@@ -80,11 +77,10 @@ define(
                             var num_of_cells = this.geometry.height / unit;
                             for (var i = 0; i <= num_of_cells; i++) {
                                 $(cells[this.source_cell[0]][this.source_cell[1] + i]).data('marked', false).detach();
-                                dead_climber_cells.push(this.source_cell[0] + '_' + (this.source_cell[1] + i));
                             }
                             var dead_copy = Physics.body('rectangle', {
                                 x: this.aabb().x
-                                , y: this.aabb().y /*- unit / 4*/ + unit / 4 + 1
+                                , y: this.aabb().y + unit / 4 + 1
                                 , height: this.geometry.height + unit / 2
                                 , width: this.geometry.width
                                 , restitution: 1
@@ -99,11 +95,10 @@ define(
                             var num_of_cells = Math.ceil(this.geometry.width / unit);
                             for (var i = 0; i < num_of_cells; i++) {
                                 $(cells[this.source_cell[0] + i][this.source_cell[1]]).data('marked', false).detach();
-                                dead_climber_cells.push((this.source_cell[0] + i) + '_' + this.source_cell[1]);
                             }
                             var dead_copy = Physics.body('rectangle', {
                                 x: this.aabb().x + unit / 4 + 1
-                                , y: this.aabb().y /*- unit / 4*/ 
+                                , y: this.aabb().y  
                                 , height: this.geometry.height
                                 , width: this.geometry.width + unit / 2
                                 , restitution: 1
@@ -118,11 +113,10 @@ define(
                             var num_of_cells = Math.ceil(this.geometry.width / unit);
                             for (var i = 0; i < num_of_cells; i++) {
                                 $(cells[this.source_cell[0] - i][this.source_cell[1]]).data('marked', false).detach();
-                                dead_climber_cells.push((this.source_cell[0] - i) + '_' + this.source_cell[1]);
                             }
                             var dead_copy = Physics.body('rectangle', {
                                 x: this.aabb().x - unit / 4 + 1
-                                , y: this.aabb().y /*- unit / 4*/
+                                , y: this.aabb().y 
                                 , height: this.geometry.height
                                 , width: this.geometry.width + unit / 2
                                 , restitution: 1

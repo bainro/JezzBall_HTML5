@@ -6,20 +6,23 @@ define(
         Physics
     ) {
 
-        //If the referenced cell is real, not marked as true, and still attached to the DOM
-        function flood_mark(indexes) {
-            if (
-                indexes[0] >= 0 && indexes[0] < 27 && indexes[1] >= 0 && indexes[1] < 18 &&
-                $(cells[indexes[0]][indexes[1]]).data('marked') === false &&
-                $.contains(document.getElementById('cell_container'), $(cells[indexes[0]][indexes[1]])[0])
-            ) {
-                $(cells[indexes[0]][indexes[1]]).data('marked', true);
-
+        function flood_mark(col, row) {
+            if ($.contains(document.getElementById('cell_container'), $(cells[col][row])[0])) {
+                //mark the cell as visited
+                $(cells[col][row]).data('marked', true);
                 //recursive calls passing each adjacent cell
-                flood_mark([indexes[0] + 1, indexes[1]]);
-                flood_mark([indexes[0] - 1, indexes[1]]);
-                flood_mark([indexes[0], indexes[1] - 1]);
-                flood_mark([indexes[0], indexes[1] + 1]);
+                if (col + 1 < 27 && $(cells[col + 1][row]).data('marked') === false) {
+                    flood_mark(col + 1, row);
+                }
+                if (col - 1 >= 0 && $(cells[col - 1][row]).data('marked') === false) {
+                    flood_mark(col - 1, row);
+                }
+                if (row - 1 >= 0 && $(cells[col][row - 1]).data('marked') === false) {
+                    flood_mark(col, row - 1);
+                }
+                if (row + 1 < 18 && $(cells[col][row + 1]).data('marked') === false) {
+                    flood_mark(col, row + 1);
+                }
             }
             return;
         }
@@ -38,37 +41,46 @@ define(
                 }
             }
 
-            if ($('#cell_container').children().length <= 121) {
+            var percent = Math.round((486 - $('#cell_container').children().length) / 4.86);
+            $('#percent').html(String(percent).substring(0, 2).padStart(2, '0') + '%');
+
+            if (percent >= 75) {
+
+                clearInterval(timer_id);
 
                 if (lvl >= 5) {
                     //then you win and restart
                     $('#between_lvl_screen').css({ display: 'block', background: 'rgba(255, 255, 255, 0.84)' }).html('YOU BEAT THE GAME!');
                     $('#between_lvl_screen').center();
-                    setTimeout( () => {
+                    setTimeout(() => {
                         $(document).on('click', function () {
-                            world.destroy();
-                            $('.pjs-meta').remove();
+                            self_destruct = false;
+                            $('#viewport').off('click');
+                            $('html').off('swipe mouseup');
+                            $('#cell_container').empty();
+                            //$('.pjs-meta').remove();
                             $('#between_lvl_screen').css('display', 'hidden');
+                            $(document).off('click');
                             new_game();
                         });
                     }, 250);
                 }
                 else {
-                    $('#between_lvl_screen').css({ display: 'block', background: 'rgba(255, 255, 255, 0.84)'}).html('Lvl ' + lvl + ' completed! Tap to continue');
-                    $('#between_lvl_screen').center();
+                    lives += (lvl + 1);
                     self_destruct = true;
+
+                    $('#lives').html(lives);
+                    $('#between_lvl_screen').css({ display: 'block', background: 'rgba(255, 255, 255, 0.84)' }).html('Lvl ' + lvl + ' completed! Tap to continue');
+                    $('#between_lvl_screen').center();
 
                     setTimeout(function () {
                         $('#viewport').off('click');
 
                         $(document).on('click touchend', (e) => {
 
+                            $('#percent').html('00%');
                             $('#between_lvl_screen').css('display', 'none');
                             self_destruct = false;
-
-                            var balls = world.find(Physics.query({
-                                name: 'circle'
-                            }));
 
                             var climbers = world.find(Physics.query({
                                 name: 'climber'
@@ -84,7 +96,7 @@ define(
 
                             for (i = 0; i < 27; i++) {
                                 for (j = 0; j < 18; j++) {
-                                    $('#cell_container').append(cells[i][j]); //.data('marked', false);
+                                    $('#cell_container').append(cells[i][j]);
                                 }
                             }
 
@@ -94,35 +106,70 @@ define(
                                     backgroundSize: "cover",
                                     backgroundPosition: "center",
                                     backgroundColor: "black"
-                                });
+                                }
+                            );
+
+                            time_left = 120;
+                            $('#timer').html(120);
+                            $('#timer').css('color', 'black');
+                            timer_id = setInterval(() => {
+                                if (time_left-- > 0) {
+                                    $('#timer').html(String(time_left).padStart(3, '0'));
+                                    if (time_left == 30) {
+                                        $('#timer').css('color', '#ff1f1f');
+                                    }
+                                }
+                                else {
+                                    $('#between_lvl_screen').css({ display: 'block', background: 'rgba(255, 255, 255, 0.84)' }).html('Game Over! Tap to restart');
+                                    $('#between_lvl_screen').center();
+                                    clearInterval(timer_id);
+                                    world.remove(world.find(Physics.query({
+                                        name: 'climber'
+                                    })));
+                                    self_destruct = true;
+                                    setTimeout(() => {
+                                        $(document).on('click', function () {
+                                            self_destruct = false;
+                                            $('#viewport').off('click');
+                                            $('html').off('swipe mouseup');
+                                            $('#cell_container').empty();
+                                            //$('.pjs-meta').remove();
+                                            $('#between_lvl_screen').css('display', 'hidden');
+                                            $(document).off('click');
+                                            new_game();
+                                        });
+                                    }, 250);
+                                }
+                            }, 1000);
 
                             var i = lvl + 1,
-                                balls = [],
                                 view = new Image();
 
+                            balls = [];
                             view.width = unit - 1;
                             view.height = unit - 1;
                             view.src = ('./images/jezzball_ball.png');
 
                             while (i--) {
-                                var plus_or_minus = Math.random() < 0.5 ? -1 : 1;
-                                var random_velocity = Math.random() * .25 - .125;
-                                var ball = Physics.body('circle', {
-                                    x: Math.random() * canvasWidth
-                                    , y: Math.random() * canvasHeight
-                                    , radius: unit / 2 - .5
-                                    , vx: random_velocity
-                                    , vy: (0.0625 - random_velocity ** 2) ** 0.5 * plus_or_minus
-                                    , angularVelocity: Math.random() * .02 - .01
-                                    , mass: 0.001
-                                    , restitution: 1
-                                    , cof: 0
-                                    , styles: {
-                                        strokeStyle: '#f4356f'
-                                        , fillStyle: 'black'
-                                        , angleIndicator: '#ff00ff'
-                                    }
-                                });
+                                var plus_or_minus = Math.random() < 0.5 ? -1 : 1,
+                                    max_v = unit ** 1.5 / 400,
+                                    random_v = Math.random() * max_v - 0.5 * max_v,
+                                    ball = Physics.body('circle', {
+                                        x: Math.random() * canvasWidth
+                                        , y: Math.random() * canvasHeight
+                                        , radius: unit / 2 - .5
+                                        , vx: random_v
+                                        , vy: (max_v ** 2 - random_v ** 2) ** 0.5 * plus_or_minus
+                                        , angularVelocity: Math.random() * .02 - .01
+                                        , mass: 0.001
+                                        , restitution: 1
+                                        , cof: 0
+                                        , styles: {
+                                            strokeStyle: '#f4356f'
+                                            , fillStyle: 'black'
+                                            , angleIndicator: 'green'
+                                        }
+                                    });
                                 ball.view = view;
                                 ball.gameType = 'circle';
                                 balls.push(ball);
@@ -130,15 +177,16 @@ define(
 
                             world.add(balls);
                             $(document).off('click touchend');
-                            setTimeout( function () {
+                            setTimeout(function () {
                                 load_climber_handler();
                             }, 150);
                         });
                     }, 250);
                 }
-                up_down_dir = true;
-                lvl++;
-                cells_left = 486;
+                dir_toggle = true;
+                $('#current_dir').html('&#8597;');
+                document.body.style.cursor = 'n-resize';
+                lvl = lvl + 1;
             }
         }
 
@@ -182,6 +230,29 @@ define(
                                 world.removeBody(col.bodyB);
                             }
 
+                            $('#lives').html(--lives);
+                            if (lives <= 0) {
+                                $('#between_lvl_screen').css({ display: 'block', background: 'rgba(255, 255, 255, 0.84)' }).html('Game Over! Tap to restart');
+                                $('#between_lvl_screen').center();
+                                clearInterval(timer_id);
+                                world.remove(world.find(Physics.query({
+                                    name: 'climber'
+                                })));
+                                self_destruct = true;
+                                setTimeout(() => {
+                                    $(document).on('click', function () {
+                                        self_destruct = false;
+                                        $('#viewport').off('click');
+                                        $('html').off('swipe mouseup');
+                                        $('#cell_container').empty();
+                                        //$('.pjs-meta').remove();
+                                        $('#between_lvl_screen').css('display', 'hidden');
+                                        $(document).off('click');
+                                        new_game();
+                                    });
+                                }, 250);
+                            }
+                            
                             world.removeBehavior(this);
 
                             return;
@@ -192,46 +263,15 @@ define(
                         ) {
                             this.getTargets()[0].die();
 
-                            var balls = world.find(Physics.query({
-                                name: 'circle'
-                            }));
-
                             for (var i = 0; i < balls.length; i++) {
                                 //get coord's and convert to matrix indexes
                                 col = Math.round((balls[i].aabb().x - unit / 2) / unit);
                                 row = Math.round((balls[i].aabb().y - unit / 2) / unit);
-
-                                flood_mark([col, row]);
-                                $(document).trigger('request_flood_mark', [col, row]);
+                                flood_mark(col, row);
                             }
 
-
-
-
-
-                            var counter = 0,
-                                marked_tot = [];
-
-                            $(document).on('response_flood_mark', (event, marked) => {
-                                marked_tot = marked_tot.concat(JSON.parse(marked));
-                                counter++;
-                                if (counter == balls.length) {
-                                    for (var i = 0; i < marked_tot.length; i++) {
-                                        $('#' + marked_tot[i]).data('marked', true);
-                                    }
-                                    remove_unmarked();
-                                    $(document).off('response_flood_mark');
-                                    try {
-                                        world.removeBehavior(this);
-                                    }
-                                    catch (e) {return;}
-                                }
-                            });
-
-
-
-
-
+                            remove_unmarked();//world);
+                            world.removeBehavior(this);
                         }
                     }
                 },
@@ -256,39 +296,18 @@ define(
                     ) {
                         this.getTargets()[0].die();
 
-                        var col, 
-                            row,
-                            balls = world.find(Physics.query({
-                                name: 'circle'
-                            }));
+                        var col,
+                            row;
 
                         for (var i = 0; i < balls.length; i++) {
                             //get coord's and convert to matrix indexes
                             col = Math.round((balls[i].aabb().x - unit / 2) / unit);
                             row = Math.round((balls[i].aabb().y - unit / 2) / unit);
-                            
-                            flood_mark([col, row]);
-                            $(document).trigger('request_flood_mark', [col, row]);
+                            flood_mark(col, row);
                         }
 
-                        var counter = 0,
-                            marked_tot = [];
-
-                        $(document).on('response_flood_mark', (event, marked) => {
-                            marked_tot = marked_tot.concat(JSON.parse(marked));
-                            counter++;
-                            if (counter == balls.length) {
-                                for (var i = 0; i < marked_tot.length; i++) {
-                                    $('#' + marked_tot[i]).data('marked', true);
-                                }
-                                remove_unmarked();
-                                $(document).off('response_flood_mark');
-                                try {
-                                    world.removeBehavior(this);
-                                }
-                                catch (e) {return;}
-                            }
-                        });
+                        remove_unmarked();
+                        world.removeBehavior(this);
 
                     }
                 },
