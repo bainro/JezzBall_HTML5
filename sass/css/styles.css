@@ -143,7 +143,9 @@ body {
   padding: .1em; }
   #current_dir_container span {
     max-width: 100%;
-    max-height: 100%; }
+    max-height: 100%;
+    text-shadow: 1px -1px 0 #fff, 1px 1px 1px #000;
+    align-self: center; }
 
 #timer {
   display: none;

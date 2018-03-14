@@ -180,15 +180,21 @@
 
                                 if (!world.has(this.climber1) && col > 0 && ($.contains(document.getElementById('cell_container'), $(cells[col - 1][row])[0]) || !$.contains(document.getElementById('cell_container'), $(cells[col + 1][row])[0]))) {
 
+                                    var x_pos = cell.position().left - (1 / 4) * unit - 1;
+                                    
+                                    if (col == 26 || !$.contains(document.getElementById('cell_container'), $(cells[col + 1][row])[0])) {
+                                        x_pos += unit;
+                                    }
+
                                     this.climber1 = Physics.body('climber', {
-                                        x: cell.position().left - unit / 4 - 1
+                                        x: x_pos
                                         , y: cell.position().top + unit / 2
                                         , vx: -2 * unit ** 1.5 / 4790
                                         , height: unit - 1
                                         , width: unit / 2
                                         , restitution: 1
                                         , cof: 0
-                                        , cell: [col - 1, row] // + ($.contains(document.getElementById('cell_container'), $(cells[col][row - 1])[0]) ? 1 : 0)]
+                                        , cell: [col - 1 + (col == 26 || !$.contains(document.getElementById('cell_container'), $(cells[col + 1][row])[0]) ? 1 : 0), row]
                                         , treatment: 'dynamic'
                                         , mass: 100000
                                         , dir: 'W'
@@ -206,21 +212,15 @@
 
                                 if (!world.has(this.climber2) && col < 26 && $.contains(document.getElementById('cell_container'), $(cells[col + 1][row])[0])) {
 
-                                    var x_pos = cell.position().left + unit / 4 + 1;
-
-                                    /*if (!$.contains(document.getElementById('cell_container'), $(cells[col][row - 1])[0])) {
-                                        x_pos = cell.position().left + unit / 1.3333 - unit / 2 + 1;
-                                    }*/
-
                                     this.climber2 = Physics.body('climber', {
-                                        x: x_pos
+                                        x: cell.position().left + unit / 4 + 1
                                         , y: cell.position().top + unit / 2
                                         , vx: 2 * unit ** 1.5 / 4790
                                         , height: unit - 1
                                         , width: unit / 2
                                         , restitution: 1
                                         , cof: 0
-                                        , cell: [col, row] // + ($.contains(document.getElementById('cell_container'), $(cells[col][row - 1])[0]) ? 1 : 0)]
+                                        , cell: [col, row]
                                         , treatment: 'dynamic'
                                         , mass: 100000
                                         , dir: 'E'
@@ -305,8 +305,8 @@
                         document.body.style.cursor = 'n-resize';
                         $('#current_dir_container').css({
                             display: 'flex',
-                            height: 1.5 * unit + "px",
-                            width: 1.5 * unit + "px",
+                            height: 1.7 * unit + "px",
+                            width: 1.7 * unit + "px",
                             fontSize: 1.125 * unit + 'px',
                         });
 
